@@ -32,6 +32,8 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ["**/.*"],
+      allow: [".."],
     },
   },
+  publicDir: path.resolve(import.meta.dirname, "attached_assets"),
 });

@@ -44,24 +44,24 @@ export default function Customize() {
   const getTShirtImage = (color: string, view: "front" | "back") => {
     const imageMap = {
       white: {
-        front: "../../../attached_assets/generated_images/Fair_model_white_t-shirt_front_8b4dd000.png",
-        back: "../../../attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
+        front: "/generated_images/Fair_model_white_t-shirt_front_8b4dd000.png",
+        back: "/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
       },
       red: {
-        front: "../../../attached_assets/generated_images/Fair_model_red_t-shirt_front_90e3704d.png",
-        back: "../../../attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png" // Using white back as fallback
+        front: "/generated_images/Fair_model_red_t-shirt_front_90e3704d.png",
+        back: "/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
       },
       blue: {
-        front: "../../../attached_assets/generated_images/Fair_model_blue_t-shirt_front_797a4390.png",
-        back: "../../../attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
+        front: "/generated_images/Fair_model_blue_t-shirt_front_797a4390.png",
+        back: "/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
       },
       black: {
-        front: "../../../attached_assets/generated_images/Fair_model_black_t-shirt_front_70633eb0.png",
-        back: "../../../attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
+        front: "/generated_images/Fair_model_black_t-shirt_front_70633eb0.png",
+        back: "/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
       },
       green: {
-        front: "../../../attached_assets/generated_images/Fair_model_green_t-shirt_front_8ef122f7.png",
-        back: "../../../attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
+        front: "/generated_images/Fair_model_green_t-shirt_front_8ef122f7.png",
+        back: "/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
       }
     };
     
