@@ -39,10 +39,10 @@ function Home() {
 
   const featuredProducts = products?.slice(0, 8) || [];
   const customCategories = [
-    { id: "1", name: "Cricket", slug: "cricket" },
-    { id: "2", name: "Football", slug: "football" },
-    { id: "3", name: "E-Sports", slug: "esports" },
-    { id: "4", name: "Biker", slug: "biker" }
+    { id: "1", name: "Cricket", slug: "cricket", image: "/attached_assets/cricket jersey_1757362287518.png" },
+    { id: "2", name: "Football", slug: "football", image: "/attached_assets/fotball_1757362287519.png" },
+    { id: "3", name: "E-Sports", slug: "esports", image: "/attached_assets/esports kamio_1757362287519.png" },
+    { id: "4", name: "Biker", slug: "biker", image: "/attached_assets/biker jersy kamio_1757362287518.jfif" }
   ];
 
   useEffect(() => {
@@ -180,7 +180,7 @@ function Home() {
                 <Card className="group cursor-pointer border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
                   <div className="aspect-[9/16] relative overflow-hidden">
                     <img 
-                      src={`/api/placeholder/300/500`} 
+                      src={category.image || `/api/placeholder/300/500`} 
                       alt={category.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
