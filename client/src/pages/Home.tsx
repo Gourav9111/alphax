@@ -61,59 +61,81 @@ function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with Dark Sports Theme */}
-      <section className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-16 md:py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/attached_assets/imgi_8_default_1757360006373.jpg')] bg-cover bg-center opacity-10"></div>
+      {/* Hero Section - Compact Mobile-Optimized */}
+      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 md:py-12 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 md:gap-8 items-center">
             {/* Left Content */}
-            <div className="animate-fade-in">
-              <div className="flex items-center gap-2 mb-4">
-                <Badge variant="outline" className="border-primary text-primary bg-primary/10">
-                  <Zap className="mr-1 h-3 w-3" />
-                  HIGH QUALITY SUBLIMATION PRINTING
+            <div className="order-2 lg:order-1 text-center lg:text-left">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-3">
+                <Badge variant="outline" className="border-primary text-primary bg-primary/10 text-xs">
+                  <Award className="mr-1 h-3 w-3" />
+                  CENTRAL INDIA'S BIGGEST PRINTING SERVICE
                 </Badge>
               </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                <span className="text-primary">CUSTOMIZED</span>
-                <br />
-                JERSEY
-                <br />
-                <span className="text-yellow-400">LOWER SHORTS</span>
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+                <span className="text-primary">CUSTOM</span>{" "}
+                <span className="text-yellow-400">JERSEYS</span>
+                <br className="hidden md:block" />
+                <span className="text-white">& SPORTSWEAR</span>
               </h1>
-              <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-lg">
-                Wide range of breathable fabric for{" "}
-                <span className="font-semibold text-white">FOOTBALL</span>,{" "}
-                <span className="font-semibold text-white">CRICKET</span>,{" "}
-                <span className="font-semibold text-white">BADMINTON</span>,{" "}
-                <span className="font-semibold text-white">ESPORTS</span>
+              <p className="text-sm md:text-base text-gray-300 mb-6 max-w-lg mx-auto lg:mx-0">
+                Professional jerseys for{" "}
+                <span className="font-semibold text-white">Cricket</span>,{" "}
+                <span className="font-semibold text-white">Football</span>,{" "}
+                <span className="font-semibold text-white">E-Sports</span>,{" "}
+                <span className="font-semibold text-white">Biker</span> & more
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link href="/customize">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg transform hover:scale-105 transition-all duration-300">
-                    <Paintbrush2 className="mr-2 h-5 w-5" />
+                  <Button size="default" className="bg-primary hover:bg-primary/90 text-white px-6 py-3 text-sm md:text-base w-full sm:w-auto transform hover:scale-105 transition-all duration-300">
+                    <Paintbrush2 className="mr-2 h-4 w-4" />
                     Start Customizing
                   </Button>
                 </Link>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-2 border-white text-white hover:bg-white hover:text-slate-900 px-8 py-6 text-lg transition-all duration-300"
-                >
-                  <Play className="mr-2 h-4 w-4" />
-                  Watch Demo
-                </Button>
               </div>
             </div>
             
-            {/* Right Content - Hero Image */}
-            <div className="relative">
-              <div className="hero-jersey-showcase animate-fade-in">
-                <img 
-                  src="/attached_assets/imgi_8_default_1757360006373.jpg" 
-                  alt="Custom KAMIO Jersey" 
-                  className="w-full h-auto rounded-lg shadow-2xl transform hover:scale-105 transition-all duration-500"
-                />
+            {/* Right Content - Image Slider */}
+            <div className="order-1 lg:order-2 relative">
+              <div className="relative max-w-sm mx-auto lg:max-w-full">
+                <div className="aspect-square relative overflow-hidden rounded-lg shadow-2xl">
+                  <img 
+                    src={heroImages[currentSlide]} 
+                    alt={`Custom KAMIO Jersey ${currentSlide + 1}`} 
+                    className="w-full h-full object-cover transition-all duration-500"
+                  />
+                  
+                  {/* Navigation Buttons */}
+                  <button 
+                    onClick={prevSlide}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-300"
+                    data-testid="button-prev-slide"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={nextSlide}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-300"
+                    data-testid="button-next-slide"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                  
+                  {/* Slide Indicators */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+                    {heroImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          currentSlide === index ? 'bg-primary' : 'bg-white/50'
+                        }`}
+                        data-testid={`indicator-slide-${index}`}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -152,7 +174,7 @@ function Home() {
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {heroCategories.map((category, index) => (
+            {customCategories.map((category, index) => (
               <Link key={category.id} href={`/category/${category.slug}`}>
                 <Card className="group cursor-pointer border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                   <div className="aspect-square relative overflow-hidden">
