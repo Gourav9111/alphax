@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { isAuthenticated, getCurrentUser, logout, isAdmin } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { Menu, Search, ShoppingCart, User, LogOut } from "lucide-react";
-import logoPath from "@assets/logo_1757348190720.png";
+import logoPath from "@assets/generated_images/Clean_KAMIO_logo_transparent_3545e88b.png";
 
 export default function Header() {
   const [, navigate] = useLocation();

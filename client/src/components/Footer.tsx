@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import logoPath from "@assets/logo_1757348190720.png";
+import logoPath from "@assets/generated_images/Clean_KAMIO_logo_transparent_3545e88b.png";
 
 export default function Footer() {
   return (
