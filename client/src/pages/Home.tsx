@@ -3,11 +3,21 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Paintbrush2, Play, Truck, Shield, Users, Star, ArrowRight, Zap, Award, Clock } from "lucide-react";
+import { Paintbrush2, Play, Truck, Shield, Users, Star, ArrowRight, Zap, Award, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import type { Product, Category } from "@/../../shared/schema";
 
 function Home() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const heroImages = [
+    "/attached_assets/384b3062-2d12-48c0-b609-fcd2a658bdc2_1757360568530.png",
+    "/attached_assets/425cc7e3-7984-4e75-9d76-4008deaf672e_1757360568531.png",
+    "/attached_assets/fotball_1757360568532.png",
+    "/attached_assets/WhatsApp Image 2025-08-28 at 15.56.51_6f331cbc_1757360568532.jpg"
+  ];
+
   const { data: products } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
@@ -27,7 +37,27 @@ function Home() {
   });
 
   const featuredProducts = products?.slice(0, 8) || [];
-  const heroCategories = categories?.slice(0, 4) || [];
+  const customCategories = [
+    { id: "1", name: "Cricket", slug: "cricket" },
+    { id: "2", name: "Football", slug: "football" },
+    { id: "3", name: "E-Sports", slug: "esports" },
+    { id: "4", name: "Biker", slug: "biker" }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [heroImages.length]);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  };
 
   return (
     <div className="min-h-screen">
