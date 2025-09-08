@@ -24,6 +24,7 @@ export default function Customize() {
   
   const [selectedColor, setSelectedColor] = useState("white");
   const [selectedSize, setSelectedSize] = useState("M");
+  const [viewMode, setViewMode] = useState<"front" | "back">("front");
   const [design, setDesign] = useState<DesignConfig>({
     scale: 100,
     rotation: 0,
@@ -38,6 +39,34 @@ export default function Customize() {
     { name: "Blue", value: "blue", color: "#3B82F6" },
     { name: "Green", value: "green", color: "#10B981" },
   ];
+
+  // T-shirt image mapping
+  const getTShirtImage = (color: string, view: "front" | "back") => {
+    const imageMap = {
+      white: {
+        front: "/attached_assets/generated_images/Fair_model_white_t-shirt_front_8b4dd000.png",
+        back: "/attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
+      },
+      red: {
+        front: "/attached_assets/generated_images/Fair_model_red_t-shirt_front_90e3704d.png",
+        back: "/attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png" // Using white back as fallback
+      },
+      blue: {
+        front: "/attached_assets/generated_images/Fair_model_blue_t-shirt_front_797a4390.png",
+        back: "/attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
+      },
+      black: {
+        front: "/attached_assets/generated_images/Fair_model_black_t-shirt_front_70633eb0.png",
+        back: "/attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
+      },
+      green: {
+        front: "/attached_assets/generated_images/Fair_model_green_t-shirt_front_8ef122f7.png",
+        back: "/attached_assets/generated_images/Fair_model_white_t-shirt_back_9b09833d.png"
+      }
+    };
+    
+    return imageMap[color as keyof typeof imageMap]?.[view] || imageMap.white[view];
+  };
 
   const sizes = ["XS", "S", "M", "L", "XL"];
 
@@ -150,18 +179,14 @@ export default function Customize() {
             <div className="relative">
               <Card className="shadow-lg">
                 <CardContent className="p-8">
-                  <div className="aspect-square bg-gradient-to-br from-muted/30 to-muted/60 rounded-xl flex items-center justify-center relative overflow-hidden">
+                  <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center relative overflow-hidden">
                     {/* T-shirt mockup */}
-                    <div 
-                      className="w-full h-full flex items-center justify-center relative"
-                      style={{ backgroundColor: colors.find(c => c.value === selectedColor)?.color }}
-                    >
+                    <div className="w-full h-full flex items-center justify-center relative">
                       {/* T-shirt base image */}
                       <img
-                        src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600"
-                        alt="T-shirt preview"
-                        className="w-full h-full object-cover rounded-xl opacity-80"
-                        style={{ mixBlendMode: selectedColor === 'white' ? 'multiply' : 'overlay' }}
+                        src={getTShirtImage(selectedColor, viewMode)}
+                        alt={`${selectedColor} t-shirt ${viewMode} view`}
+                        className="w-full h-full object-cover rounded-xl"
                         data-testid="img-tshirt-preview"
                       />
                       
@@ -194,8 +219,28 @@ export default function Customize() {
                     </div>
                   </div>
                   
+                  {/* View Controls */}
+                  <div className="flex justify-center mt-6 space-x-2">
+                    <Button
+                      variant={viewMode === "front" ? "default" : "outline"}
+                      onClick={() => setViewMode("front")}
+                      className="px-6"
+                      data-testid="button-front-view"
+                    >
+                      Front View
+                    </Button>
+                    <Button
+                      variant={viewMode === "back" ? "default" : "outline"}
+                      onClick={() => setViewMode("back")}
+                      className="px-6"
+                      data-testid="button-back-view"
+                    >
+                      Back View
+                    </Button>
+                  </div>
+                  
                   {/* 3D Controls */}
-                  <div className="flex justify-center mt-6 space-x-4">
+                  <div className="flex justify-center mt-4 space-x-4">
                     <Button
                       variant="outline"
                       onClick={handleRotateLeft}
