@@ -33,7 +33,7 @@ function Home() {
     <div className="min-h-screen">
       {/* Hero Section with Dark Sports Theme */}
       <section className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-16 md:py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/api/placeholder/1920/1080')] bg-cover bg-center opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/attached_assets/imgi_8_default_1757360006373.jpg')] bg-cover bg-center opacity-10"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
@@ -80,8 +80,8 @@ function Home() {
             <div className="relative">
               <div className="hero-jersey-showcase animate-fade-in">
                 <img 
-                  src="/api/placeholder/600/700" 
-                  alt="Custom Jersey Model" 
+                  src="/attached_assets/imgi_8_default_1757360006373.jpg" 
+                  alt="Custom KAMIO Jersey" 
                   className="w-full h-auto rounded-lg shadow-2xl transform hover:scale-105 transition-all duration-500"
                 />
               </div>
