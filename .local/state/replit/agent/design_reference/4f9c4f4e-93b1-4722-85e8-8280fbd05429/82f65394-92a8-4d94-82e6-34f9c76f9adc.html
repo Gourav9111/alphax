@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAMIO - Custom Lifestyle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                }
+            },
+            fontFamily: {
+                sans: ['Inter', 'system-ui', 'sans-serif'],
+            }
+        },
+    };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --background: hsl(0 0% 100%);
+            --foreground: hsl(222.2 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222.2 84% 4.9%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(222.2 84% 4.9%);
+            --primary: hsl(355 91% 45%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(222.2 84% 4.9%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215.4 16.3% 46.9%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222.2 84% 4.9%);
+            --destructive: hsl(0 84.2% 60.2%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(214.3 31.8% 91.4%);
+            --input: hsl(214.3 31.8% 91.4%);
+            --ring: hsl(355 91% 45%);
+            --radius: 0.75rem;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(227, 6, 19, 0.15);
+        }
+        
+        .logo-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .product-zoom {
+            transition: transform 0.3s ease;
+        }
+        
+        .product-zoom:hover {
+            transform: scale(1.05);
+        }
+        
+        .category-card {
+            background: linear-gradient(135deg, var(--background) 0%, var(--muted) 100%);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, hsl(355 91% 45%) 0%, hsl(355 91% 35%) 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-foreground font-sans">
+    <!-- @COMPONENT: Header [responsive navigation with mobile menu] -->
+    <header class="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center logo-pulse">
+                    <span class="text-primary-foreground font-bold text-lg">K</span>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-primary">KAMIO</h1>
+                    <p class="text-xs text-muted-foreground">Custom Lifestyle</p>
+                </div>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-foreground hover:text-primary transition-colors">Home</a>
+                <a href="#" class="text-foreground hover:text-primary transition-colors">Categories</a>
+                <a href="#" class="text-foreground hover:text-primary transition-colors">Customize</a>
+                <a href="#" class="text-foreground hover:text-primary transition-colors">About</a>
+                <a href="#" class="text-foreground hover:text-primary transition-colors">Contact</a>
+            </nav>
+            
+            <!-- Actions -->
+            <div class="flex items-center space-x-4">
+                <!-- Search -->
+                <button class="p-2 text-muted-foreground hover:text-primary transition-colors">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <!-- Cart -->
+                <button class="relative p-2 text-muted-foreground hover:text-primary transition-colors" data-event="click:handleCartOpen">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center" data-bind="cart.itemCount">3</span>
+                </button>
+                
+                <!-- User Menu -->
+                <div class="relative">
+                    <button class="p-2 text-muted-foreground hover:text-primary transition-colors">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button class="md:hidden p-2 text-muted-foreground hover:text-primary transition-colors" data-event="click:toggleMobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <!-- @COMPONENT: MobileMenu [responsive mobile navigation drawer] -->
+    <!-- @STATE: mobileMenuOpen:boolean = false -->
+    <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden hidden" data-mobile-menu>
+        <div class="absolute right-0 top-0 h-full w-64 bg-background shadow-xl">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="font-bold text-lg">Menu</h2>
+                    <button class="text-muted-foreground hover:text-primary" data-event="click:closeMobileMenu">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <nav class="space-y-4">
+                    <a href="#" class="block py-3 px-4 text-foreground hover:bg-muted hover:text-primary rounded-lg transition-all">Home</a>
+                    <a href="#" class="block py-3 px-4 text-foreground hover:bg-muted hover:text-primary rounded-lg transition-all">Categories</a>
+                    <a href="#" class="block py-3 px-4 text-foreground hover:bg-muted hover:text-primary rounded-lg transition-all">Customize</a>
+                    <a href="#" class="block py-3 px-4 text-foreground hover:bg-muted hover:text-primary rounded-lg transition-all">About</a>
+                    <a href="#" class="block py-3 px-4 text-foreground hover:bg-muted hover:text-primary rounded-lg transition-all">Contact</a>
+                    <hr class="border-border my-4">
+                    <a href="#" class="block py-3 px-4 text-foreground hover:bg-muted hover:text-primary rounded-lg transition-all">
+                        <i class="fas fa-sign-in-alt mr-3"></i>Login
+                    </a>
+                    <a href="#" class="block py-3 px-4 text-foreground hover:bg-muted hover:text-primary rounded-lg transition-all">
+                        <i class="fas fa-user-plus mr-3"></i>Sign Up
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: MobileMenu -->
+
+    <!-- @COMPONENT: HeroSection [main promotional banner with CTA] -->
+    <section class="hero-gradient py-16 md:py-24">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="animate-fade-in">
+                    <h1 class="text-4xl md:text-6xl font-bold text-primary-foreground mb-6">
+                        Design Your <span class="text-yellow-300">Custom</span> Lifestyle
+                    </h1>
+                    <p class="text-lg md:text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
+                        Create personalized t-shirts, sports jerseys, and corporate uniforms with our cutting-edge 3D design tool. From cricket to esports, we've got your style covered.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button class="bg-background text-primary px-8 py-4 rounded-lg font-semibold hover:bg-white/90 transition-all transform hover:scale-105" data-event="click:navigateToCustomize">
+                            <i class="fas fa-paint-brush mr-2"></i>Start Customizing
+                        </button>
+                        <button class="border-2 border-primary-foreground text-primary-foreground px-8 py-4 rounded-lg font-semibold hover:bg-primary-foreground hover:text-primary transition-all">
+                            <i class="fas fa-play mr-2"></i>Watch Demo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: HeroSection -->
+
+    <!-- @COMPONENT: CategoriesSection [grid of product categories with 3D hover effects] -->
+    <section class="py-16 bg-muted/30">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">Shop by Category</h2>
+                <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+                    Discover our wide range of custom apparel designed for every sport and lifestyle
+                </p>
+            </div>
+            
+            <!-- Primary Categories -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                <!-- @MAP: primaryCategories.map(category => ( -->
+                <div class="category-card p-6 rounded-xl card-hover cursor-pointer group" data-event="click:navigateToCategory" data-category="cricket">
+                    <div class="text-center">
+                        <!-- Cricket jersey with player in action pose -->
+                        <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" alt="Cricket category" class="w-16 h-16 mx-auto mb-4 rounded-xl object-cover product-zoom">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">Cricket</h3>
+                        <p class="text-sm text-muted-foreground mt-1" data-bind="category.productCount">24 items</p>
+                    </div>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl card-hover cursor-pointer group" data-event="click:navigateToCategory" data-category="football">
+                    <div class="text-center">
+                        <!-- Football/soccer players in action -->
+                        <img src="https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" alt="Football category" class="w-16 h-16 mx-auto mb-4 rounded-xl object-cover product-zoom">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">Football</h3>
+                        <p class="text-sm text-muted-foreground mt-1" data-bind="category.productCount">18 items</p>
+                    </div>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl card-hover cursor-pointer group" data-event="click:navigateToCategory" data-category="biker">
+                    <div class="text-center">
+                        <!-- Motorcycle rider with custom gear -->
+                        <img src="https://pixabay.com/get/gb87c78388072dca4e85cb90531167c62a379ad27372938fc9f2d7e9e386c0a6eb4d2926e60c69d268e95731a2e2eed8d488df22ce136cdca8caff87972ee1272_1280.jpg" alt="Biker category" class="w-16 h-16 mx-auto mb-4 rounded-xl object-cover product-zoom">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">Biker</h3>
+                        <p class="text-sm text-muted-foreground mt-1" data-bind="category.productCount">15 items</p>
+                    </div>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl card-hover cursor-pointer group" data-event="click:navigateToCategory" data-category="cyclist">
+                    <div class="text-center">
+                        <!-- Professional cyclist in racing gear -->
+                        <img src="https://pixabay.com/get/g38e18256e7d1941bc18ea00cffdf7411de8405a9283dacda0f7f42b2128d20752f8ed917bf171071b0bc6fa35b00fc39a71d380407b5ccb5cbd160afd3a00227_1280.jpg" alt="Cyclist category" class="w-16 h-16 mx-auto mb-4 rounded-xl object-cover product-zoom">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">Cyclist</h3>
+                        <p class="text-sm text-muted-foreground mt-1" data-bind="category.productCount">12 items</p>
+                    </div>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl card-hover cursor-pointer group" data-event="click:navigateToCategory" data-category="marathon">
+                    <div class="text-center">
+                        <!-- Marathon runner crossing finish line -->
+                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" alt="Marathon category" class="w-16 h-16 mx-auto mb-4 rounded-xl object-cover product-zoom">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">Marathon</h3>
+                        <p class="text-sm text-muted-foreground mt-1" data-bind="category.productCount">20 items</p>
+                    </div>
+                </div>
+                
+                <div class="category-card p-6 rounded-xl card-hover cursor-pointer group" data-event="click:navigateToCategory" data-category="esports">
+                    <div class="text-center">
+                        <!-- Gaming setup with colorful RGB lighting -->
+                        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" alt="Esports category" class="w-16 h-16 mx-auto mb-4 rounded-xl object-cover product-zoom">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">Esports</h3>
+                        <p class="text-sm text-muted-foreground mt-1" data-bind="category.productCount">16 items</p>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+            
+            <!-- Secondary Categories -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="category-card p-4 rounded-xl card-hover cursor-pointer group">
+                    <div class="text-center">
+                        <!-- Custom flags with various country designs -->
+                        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" alt="Custom Flags category" class="w-12 h-12 mx-auto mb-3 rounded-lg object-cover product-zoom">
+                        <h4 class="font-medium text-foreground group-hover:text-primary transition-colors">Custom Flags</h4>
+                        <p class="text-xs text-muted-foreground mt-1">8 items</p>
+                    </div>
+                </div>
+                
+                <div class="category-card p-4 rounded-xl card-hover cursor-pointer group">
+                    <div class="text-center">
+                        <!-- Corporate gift items including branded merchandise -->
+                        <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" alt="Corporate Gifts category" class="w-12 h-12 mx-auto mb-3 rounded-lg object-cover product-zoom">
+                        <h4 class="font-medium text-foreground group-hover:text-primary transition-colors">Corporate Gifts</h4>
+                        <p class="text-xs text-muted-foreground mt-1">25 items</p>
+                    </div>
+                </div>
+                
+                <div class="category-card p-4 rounded-xl card-hover cursor-pointer group">
+                    <div class="text-center">
+                        <!-- Professional corporate uniforms for office workers -->
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" alt="Corporate Uniforms category" class="w-12 h-12 mx-auto mb-3 rounded-lg object-cover product-zoom">
+                        <h4 class="font-medium text-foreground group-hover:text-primary transition-colors">Corporate Uniforms</h4>
+                        <p class="text-xs text-muted-foreground mt-1">18 items</p>
+                    </div>
+                </div>
+                
+                <div class="category-card p-4 rounded-xl card-hover cursor-pointer group">
+                    <div class="text-center">
+                        <!-- Colorful vinyl stickers with various designs -->
+                        <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" alt="Stickers category" class="w-12 h-12 mx-auto mb-3 rounded-lg object-cover product-zoom">
+                        <h4 class="font-medium text-foreground group-hover:text-primary transition-colors">Stickers</h4>
+                        <p class="text-xs text-muted-foreground mt-1">32 items</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: CategoriesSection -->
+
+    <!-- @COMPONENT: FeaturedProducts [carousel/slider of latest products] -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">Featured Products</h2>
+                    <p class="text-muted-foreground text-lg">Our most popular custom designs</p>
+                </div>
+                <div class="hidden md:flex space-x-2">
+                    <button class="p-3 rounded-full border border-border hover:bg-muted transition-colors" data-event="click:prevSlide">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="p-3 rounded-full border border-border hover:bg-muted transition-colors" data-event="click:nextSlide">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- @MAP: featuredProducts.map(product => ( -->
+                <div class="bg-card rounded-xl shadow-sm hover:shadow-lg transition-all card-hover group cursor-pointer" data-event="click:viewProduct" data-product-id="1">
+                    <div class="relative overflow-hidden rounded-t-xl">
+                        <!-- High-quality gaming t-shirt with colorful esports design -->
+                        <img src="https://pixabay.com/get/g4247551d5d483f87470f7cf6d7eafdb1c2c50f0cf15376cccaa5d84986fa0cd98c74287f34c70e75b4c89ba066ba6172b1054e830dd91e910df98dc4d7f1fdd4_1280.jpg" alt="Gaming Pro Jersey" class="w-full h-64 object-cover product-zoom">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-semibold">New</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-background/80 backdrop-blur-sm p-2 rounded-full text-muted-foreground hover:text-primary transition-colors">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors mb-2" data-bind="product.name">Gaming Pro Jersey</h3>
+                        <p class="text-sm text-muted-foreground mb-3" data-bind="product.description">Custom esports jersey with premium fabric</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-1">
+                                <span class="text-lg font-bold text-primary" data-bind="product.price">₹549</span>
+                                <span class="text-sm text-muted-foreground line-through" data-bind="product.originalPrice">₹699</span>
+                            </div>
+                            <div class="flex items-center text-sm text-muted-foreground">
+                                <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                <span data-bind="product.rating">4.8</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-3 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 transition-colors" data-event="click:addToCart" data-product-id="1">
+                            <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-card rounded-xl shadow-sm hover:shadow-lg transition-all card-hover group cursor-pointer" data-event="click:viewProduct" data-product-id="2">
+                    <div class="relative overflow-hidden rounded-t-xl">
+                        <!-- Professional cricket jersey with team colors -->
+                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=600" alt="Cricket Team Jersey" class="w-full h-64 object-cover product-zoom">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">Popular</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-background/80 backdrop-blur-sm p-2 rounded-full text-muted-foreground hover:text-primary transition-colors">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors mb-2">Cricket Team Jersey</h3>
+                        <p class="text-sm text-muted-foreground mb-3">Professional cricket uniform with custom printing</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-1">
+                                <span class="text-lg font-bold text-primary">₹649</span>
+                                <span class="text-sm text-muted-foreground line-through">₹799</span>
+                            </div>
+                            <div class="flex items-center text-sm text-muted-foreground">
+                                <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-3 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-card rounded-xl shadow-sm hover:shadow-lg transition-all card-hover group cursor-pointer" data-event="click:viewProduct" data-product-id="3">
+                    <div class="relative overflow-hidden rounded-t-xl">
+                        <!-- Corporate polo shirt for professional use -->
+                        <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=600" alt="Corporate Polo" class="w-full h-64 object-cover product-zoom">
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-background/80 backdrop-blur-sm p-2 rounded-full text-muted-foreground hover:text-primary transition-colors">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors mb-2">Corporate Polo</h3>
+                        <p class="text-sm text-muted-foreground mb-3">Professional polo shirt for corporate events</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-1">
+                                <span class="text-lg font-bold text-primary">₹449</span>
+                            </div>
+                            <div class="flex items-center text-sm text-muted-foreground">
+                                <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                <span>4.7</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-3 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-card rounded-xl shadow-sm hover:shadow-lg transition-all card-hover group cursor-pointer" data-event="click:viewProduct" data-product-id="4">
+                    <div class="relative overflow-hidden rounded-t-xl">
+                        <!-- Marathon running shirt with moisture-wicking fabric -->
+                        <img src="https://pixabay.com/get/gc1810294f6883a689724ce3546be01f9e6a98923b2095792f051513f9d481e2d963e41ffcd5bb77ace3b1c1e3a85b7ec4c4a8cf8f5f985c22357727e9cbf5aae_1280.jpg" alt="Marathon Runner Tee" class="w-full h-64 object-cover product-zoom">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold">Limited</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-background/80 backdrop-blur-sm p-2 rounded-full text-muted-foreground hover:text-primary transition-colors">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors mb-2">Marathon Runner Tee</h3>
+                        <p class="text-sm text-muted-foreground mb-3">Ultra-light running shirt with custom design</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-1">
+                                <span class="text-lg font-bold text-primary">₹399</span>
+                                <span class="text-sm text-muted-foreground line-through">₹499</span>
+                            </div>
+                            <div class="flex items-center text-sm text-muted-foreground">
+                                <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                <span>4.6</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-3 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: FeaturedProducts -->
+
+    <!-- @COMPONENT: CustomizeSection [3D t-shirt preview and customization tools] -->
+    <section class="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">3D T-Shirt Customizer</h2>
+                    <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+                        Design your perfect t-shirt with our interactive 3D preview. Upload your logo, adjust positioning, and see your creation come to life.
+                    </p>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- 3D Preview -->
+                    <div class="relative">
+                        <div class="bg-card rounded-2xl p-8 shadow-lg">
+                            <div class="aspect-square bg-gradient-to-br from-muted/30 to-muted/60 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                <!-- 3D T-shirt mockup with custom design preview area -->
+                                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=600" alt="3D T-shirt preview" class="w-full h-full object-cover rounded-xl">
+                                
+                                <!-- Design Overlay Area -->
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="w-32 h-32 border-2 border-primary/50 border-dashed rounded-lg flex items-center justify-center bg-background/80 backdrop-blur-sm" data-drop-zone="true">
+                                        <div class="text-center" data-mock="true">
+                                            <i class="fas fa-upload text-2xl text-primary mb-2"></i>
+                                            <p class="text-xs text-muted-foreground">Drop logo here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 3D Controls -->
+                            <div class="flex justify-center mt-6 space-x-4">
+                                <button class="px-4 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors">
+                                    <i class="fas fa-undo mr-2"></i>Rotate Left
+                                </button>
+                                <button class="px-4 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors">
+                                    <i class="fas fa-redo mr-2"></i>Rotate Right
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Customization Panel -->
+                    <div class="space-y-6">
+                        <!-- Upload Section -->
+                        <div class="bg-card rounded-xl p-6">
+                            <h3 class="font-semibold text-lg mb-4">Upload Your Design</h3>
+                            <div class="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" data-implementation="FileUpload component with drag-drop">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-muted-foreground mb-3"></i>
+                                <p class="text-muted-foreground mb-2">Drag & drop your image or</p>
+                                <button class="text-primary hover:underline">Browse Files</button>
+                                <p class="text-xs text-muted-foreground mt-2">Supports PNG, JPG, SVG (Max 10MB)</p>
+                            </div>
+                        </div>
+                        
+                        <!-- T-shirt Options -->
+                        <div class="bg-card rounded-xl p-6">
+                            <h3 class="font-semibold text-lg mb-4">T-shirt Options</h3>
+                            
+                            <!-- Color Selection -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Color</label>
+                                <div class="flex space-x-2">
+                                    <button class="w-10 h-10 rounded-full bg-white border-2 border-border hover:border-primary transition-colors" data-color="white"></button>
+                                    <button class="w-10 h-10 rounded-full bg-black border-2 border-border hover:border-primary transition-colors" data-color="black"></button>
+                                    <button class="w-10 h-10 rounded-full bg-primary border-2 border-border hover:border-primary transition-colors" data-color="red"></button>
+                                    <button class="w-10 h-10 rounded-full bg-blue-500 border-2 border-border hover:border-primary transition-colors" data-color="blue"></button>
+                                    <button class="w-10 h-10 rounded-full bg-green-500 border-2 border-border hover:border-primary transition-colors" data-color="green"></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Size Selection -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Size</label>
+                                <div class="grid grid-cols-5 gap-2">
+                                    <button class="py-2 text-center border border-border rounded-lg hover:border-primary hover:bg-primary hover:text-primary-foreground transition-all" data-size="XS">XS</button>
+                                    <button class="py-2 text-center border border-border rounded-lg hover:border-primary hover:bg-primary hover:text-primary-foreground transition-all" data-size="S">S</button>
+                                    <button class="py-2 text-center border border-primary bg-primary text-primary-foreground rounded-lg" data-size="M">M</button>
+                                    <button class="py-2 text-center border border-border rounded-lg hover:border-primary hover:bg-primary hover:text-primary-foreground transition-all" data-size="L">L</button>
+                                    <button class="py-2 text-center border border-border rounded-lg hover:border-primary hover:bg-primary hover:text-primary-foreground transition-all" data-size="XL">XL</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Design Controls -->
+                        <div class="bg-card rounded-xl p-6">
+                            <h3 class="font-semibold text-lg mb-4">Design Position</h3>
+                            
+                            <!-- Position Controls -->
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Scale</label>
+                                    <input type="range" class="w-full" min="50" max="150" value="100" data-bind="design.scale">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Rotation</label>
+                                    <input type="range" class="w-full" min="0" max="360" value="0" data-bind="design.rotation">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">X Position</label>
+                                        <input type="range" class="w-full" min="-50" max="50" value="0" data-bind="design.x">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Y Position</label>
+                                        <input type="range" class="w-full" min="-50" max="50" value="0" data-bind="design.y">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Price & Add to Cart -->
+                        <div class="bg-card rounded-xl p-6 border-2 border-primary/20">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-lg font-semibold">Total Price:</span>
+                                <span class="text-2xl font-bold text-primary" data-bind="customize.totalPrice">₹549</span>
+                            </div>
+                            <div class="text-sm text-muted-foreground mb-4">
+                                <p>• Base price: ₹400</p>
+                                <p>• Design area: ₹149</p>
+                            </div>
+                            <button class="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors" data-event="click:addCustomTshirtToCart">
+                                <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: CustomizeSection -->
+
+    <!-- @COMPONENT: TestimonialsSection [customer reviews and testimonials] -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">What Our Customers Say</h2>
+                <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+                    Join thousands of satisfied customers who love their custom apparel
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-card rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-500 mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="text-sm text-muted-foreground">5.0</span>
+                    </div>
+                    <p class="text-muted-foreground mb-4" data-mock="true">
+                        "Amazing quality and the 3D customizer made it so easy to design exactly what I wanted for our cricket team. Fast delivery too!"
+                    </p>
+                    <div class="flex items-center">
+                        <!-- Professional athlete headshot -->
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Customer photo" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <p class="font-semibold" data-mock="true">Rahul Sharma</p>
+                            <p class="text-sm text-muted-foreground" data-mock="true">Cricket Team Captain</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-card rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-500 mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="text-sm text-muted-foreground">5.0</span>
+                    </div>
+                    <p class="text-muted-foreground mb-4" data-mock="true">
+                        "Perfect for our corporate event. The team was professional and delivered exactly what we asked for. Highly recommended!"
+                    </p>
+                    <div class="flex items-center">
+                        <!-- Business professional headshot -->
+                        <img src="https://pixabay.com/get/g041383268c56c554ee52d89790af76036547cd9da6f984cd769ff6640127a502598e55094239966a01690a8f904333bbc837b7f5e1057338b11dda102dee7434_1280.jpg" alt="Customer photo" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <p class="font-semibold" data-mock="true">Priya Patel</p>
+                            <p class="text-sm text-muted-foreground" data-mock="true">HR Manager</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-card rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-500 mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="text-sm text-muted-foreground">5.0</span>
+                    </div>
+                    <p class="text-muted-foreground mb-4" data-mock="true">
+                        "Love the gaming jerseys! The quality is top-notch and the designs are exactly what our esports team needed."
+                    </p>
+                    <div class="flex items-center">
+                        <!-- Young gamer headshot -->
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" alt="Customer photo" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <p class="font-semibold" data-mock="true">Arjun Kumar</p>
+                            <p class="text-sm text-muted-foreground" data-mock="true">Esports Player</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: TestimonialsSection -->
+
+    <!-- @COMPONENT: Footer [comprehensive site footer with links and information] -->
+    <footer class="bg-foreground text-background py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <!-- Brand Section -->
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-primary-foreground font-bold text-lg">K</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-primary">KAMIO</h3>
+                            <p class="text-xs text-muted">Custom Lifestyle</p>
+                        </div>
+                    </div>
+                    <p class="text-muted text-sm mb-4">
+                        Creating custom apparel for sports teams, corporations, and individuals since 2020. Quality guaranteed.
+                    </p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="text-muted hover:text-primary transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-muted hover:text-primary transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-muted hover:text-primary transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-muted hover:text-primary transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Home</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Categories</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Customize</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">About Us</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Categories -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Categories</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Cricket</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Football</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Esports</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Corporate</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Custom Flags</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Support -->
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Size Guide</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Shipping Info</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Returns</a></li>
+                        <li><a href="#" class="text-muted hover:text-primary transition-colors">Track Order</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-muted-foreground/20 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-muted text-sm mb-4 md:mb-0">
+                        © 2024 KAMIO Custom Lifestyle. All rights reserved.
+                    </p>
+                    <div class="flex space-x-6 text-sm">
+                        <a href="#" class="text-muted hover:text-primary transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-muted hover:text-primary transition-colors">Terms of Service</a>
+                        <a href="#" class="text-muted hover:text-primary transition-colors">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <!-- @COMPONENT: FloatingActionButton [quick access to customize feature] -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button class="bg-primary text-primary-foreground w-14 h-14 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all group" data-event="click:openCustomizeModal" title="Quick Customize">
+            <i class="fas fa-paint-brush group-hover:rotate-12 transition-transform"></i>
+        </button>
+    </div>
+    <!-- @END_COMPONENT: FloatingActionButton -->
+
+    <script>
+        // TODO: Implement React components and state management
+        // TODO: Add authentication functionality
+        // TODO: Implement shopping cart logic
+        // TODO: Add 3D customization functionality
+        // TODO: Connect to backend API endpoints
+        
+        (function() {
+            // Basic mobile menu toggle functionality for demo
+            const mobileMenuToggle = document.querySelector('[data-event="click:toggleMobileMenu"]');
+            const mobileMenu = document.querySelector('[data-mobile-menu]');
+            const closeMobileMenu = document.querySelector('[data-event="click:closeMobileMenu"]');
+            
+            if (mobileMenuToggle && mobileMenu) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            if (closeMobileMenu && mobileMenu) {
+                closeMobileMenu.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            }
+            
+            // Close mobile menu when clicking outside
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', (e) => {
+                    if (e.target === mobileMenu) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Color selector functionality for demo
+            const colorButtons = document.querySelectorAll('[data-color]');
+            colorButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    colorButtons.forEach(btn => btn.classList.remove('border-primary'));
+                    button.classList.add('border-primary');
+                });
+            });
+            
+            // Size selector functionality for demo
+            const sizeButtons = document.querySelectorAll('[data-size]');
+            sizeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    sizeButtons.forEach(btn => {
+                        btn.classList.remove('border-primary', 'bg-primary', 'text-primary-foreground');
+                        btn.classList.add('border-border');
+                    });
+                    button.classList.remove('border-border');
+                    button.classList.add('border-primary', 'bg-primary', 'text-primary-foreground');
+                });
+            });
+            
+            // Price calculator demo
+            const scaleSlider = document.querySelector('input[data-bind="design.scale"]');
+            const priceElement = document.querySelector('[data-bind="customize.totalPrice"]');
+            
+            if (scaleSlider && priceElement) {
+                scaleSlider.addEventListener('input', () => {
+                    const scale = parseInt(scaleSlider.value);
+                    const basePrice = 400;
+                    const designPrice = Math.floor((scale - 50) * 2); // Dynamic pricing based on scale
+                    const totalPrice = basePrice + Math.max(designPrice, 0);
+                    priceElement.textContent = `₹${totalPrice}`;
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+Project: Kamio.in — Full-stack mobile-first e-commerce platform
+
+Stack:
+- Frontend: React (Vite or CRA, TypeScript), TailwindCSS, Framer Motion for 3D/animated UI
+- Backend: Node.js + Express (TypeScript optional)
+- Database: MongoDB with GridFS for image storage (no external URLs allowed)
+- Auth: JWT-based signup/login (email + password), optional Google OAuth
+- Admin: React dashboard under /admin (JWT protected)
+- File Uploads: Multer → GridFS; images validated, compressed server-side
+
+Design:
+- Primary colors: #E30613 (red), #FFFFFF (white), #F8F8F8 (off-white)
+- Mobile-first responsive layouts
+- Smooth 3D card hover effects for categories & products
+- All pages must work on mobile and desktop
+
+Core Requirements:
+1. All images must be uploaded through admin panel and stored in GridFS — strictly no external URLs.
+2. Seed admin user (dev): admin@kamio.in / kamio9111
+3. Categories: Cricket, Football, Biker, Cyclist, Marathon, Esports (top); Custom Flags, Corporate Gifts, Corporate Uniforms, Stickers (secondary).
+4. Products: support up to 5 images, sizes, colors, inventory, variable price tiers.
+5. Customize page: 3D T-shirt mockup where users upload logos/images, position/scale, preview, and add to cart (₹400–₹800 based on print area).
+6. Order workflow: Pending → Packed → Dispatched → Shipped → Delivered → Cancelled
+
+Frontend Pages (React):
+- `/` → Home (KAMIO logo animation, top categories grid, latest products slider)
+- `/category/:slug` → Category listing
+- `/product/:id` → Product detail (5-image carousel, size/color selectors, zoom modal)
+- `/customize` → 3D t-shirt mockup builder
+- `/cart` → Shopping cart
+- `/checkout` → Checkout flow
+- `/profile` → User profile + order history
+- `/login` & `/signup` → Email auth
+- `/about`, `/contact`
+- `/admin/*` → Admin dashboard (categories, products, users, orders, settings, customize orders)
+
+Backend API Routes (Express):
+- POST /api/auth/signup
+- POST /api/auth/login
+- GET /api/categories
+- POST /api/categories (admin only)
+- GET /api/categories/:id/products
+- POST /api/products (admin only, up to 5 images)
+- GET /api/products/:id
+- PUT /api/products/:id (admin only)
+- DELETE /api/products/:id (admin only)
+- POST /api/uploads/image → GridFS upload
+- GET /api/images/:fileId → GridFS stream
+- POST /api/cart
+- POST /api/orders
+- GET /api/admin/orders
+- PATCH /api/admin/orders/:id/status
+
+Seed Data:
+- `scripts/seedAdmin.js` → creates admin user
+- `scripts/seedCategories.js` → inserts main categories
+- `scripts/seedProducts.js` → sample products (using admin-uploaded images)
+
+Deployment (VPS/Hostinger):
+- Provide Dockerfile + docker-compose.yml to run web (React build + static serve) and API (Express)
+- Environment vars managed via `.env`
+- Domain binding: configure Nginx reverse proxy for frontend + backend, point domain DNS to VPS
+
+Deliverables for MVP:
+✅ React frontend with all routes
+✅ Express backend with full CRUD + GridFS
+✅ Admin dashboard with category/product/user/order management
+✅ Image upload flow (GridFS only, no external URLs)
+✅ Seed scripts for admin + categories
+✅ Fully mobile-optimized UI
+✅ README.md with Hostinger VPS setup and domain linking instructions
