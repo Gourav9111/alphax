@@ -13,11 +13,11 @@ export default function CategoryCard({ category, size = "large" }: CategoryCardP
   return (
     <Link href={`/category/${category.slug}`}>
       <Card className="category-card rounded-xl card-hover cursor-pointer group" data-testid={`card-category-${category.slug}`}>
-        <CardContent className={`${isLarge ? "p-6" : "p-4"} text-center`}>
+        <CardContent className={`${isLarge ? "p-6" : "p-5"} text-center`}>
           <img
             src={category.image || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"}
             alt={category.name}
-            className={`${isLarge ? "w-32 h-48" : "w-20 h-30"} mx-auto mb-${isLarge ? "4" : "3"} rounded-xl object-cover product-zoom`}
+            className={`${isLarge ? "w-32 h-48" : "w-28 h-40"} mx-auto mb-${isLarge ? "4" : "3"} rounded-xl object-cover product-zoom`}
             style={{ aspectRatio: '9/16' }}
             data-testid={`img-category-${category.slug}`}
           />
