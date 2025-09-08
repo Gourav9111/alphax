@@ -177,9 +177,9 @@ function Home() {
             {customCategories.map((category, index) => (
               <Link key={category.id} href={`/category/${category.slug}`}>
                 <Card className="group cursor-pointer border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
-                  <div className="aspect-square relative overflow-hidden">
+                  <div className="aspect-[9/16] relative overflow-hidden">
                     <img 
-                      src={`/api/placeholder/300/300`} 
+                      src={`/api/placeholder/300/500`} 
                       alt={category.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
