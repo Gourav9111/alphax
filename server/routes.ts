@@ -3,7 +3,9 @@ import { createServer, type Server } from "http";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
+import multer from "multer";
 import { storage } from "./storage.js";
 import { insertUserSchema, insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema } from "@shared/schema";
 
@@ -24,6 +26,33 @@ const JWT_SECRET = process.env.JWT_SECRET || "kamio-secret-key";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Ensure upload directory exists
+const uploadDir = path.join(__dirname, "..", "uploaded_images");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer configuration for image uploads
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: uploadDir,
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
 
 // Middleware to verify JWT token
 function authenticateToken(req: Request, res: Response, next: Function) {
@@ -88,6 +117,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role }, token });
     } catch (error) {
       res.status(500).json({ message: "Login failed", error });
+    }
+  });
+
+  // Image upload route
+  app.post("/api/upload", authenticateToken, upload.single('image'), (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+      
+      const imageUrl = `/api/images/${encodeURIComponent(req.file.filename)}`;
+      res.json({ url: imageUrl, filename: req.file.filename });
+    } catch (error) {
+      res.status(500).json({ message: 'File upload failed', error });
     }
   });
 

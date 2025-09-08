@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { isAuthenticated, isAdmin, createAuthenticatedRequest } from "@/lib/auth";
-import { Plus, Edit, Trash2, Package } from "lucide-react";
+import { Plus, Edit, Trash2, Package, Upload, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Product, Category } from "@shared/schema";
 
@@ -40,6 +40,9 @@ export default function AdminProducts() {
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ["/api/products"],
@@ -91,6 +94,7 @@ export default function AdminProducts() {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Product created successfully" });
       setIsCreateOpen(false);
+      clearImageState();
       form.reset();
     },
     onError: (error: Error) => {
@@ -126,6 +130,7 @@ export default function AdminProducts() {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Product updated successfully" });
       setEditingProduct(null);
+      clearImageState();
       form.reset();
     },
     onError: (error: Error) => {
@@ -163,16 +168,91 @@ export default function AdminProducts() {
     },
   });
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length + imageFiles.length > 5) {
+      toast({
+        title: "Too many images",
+        description: "You can upload a maximum of 5 images per product",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create preview URLs
+    const newPreviews = files.map(file => URL.createObjectURL(file));
+    setImageFiles(prev => [...prev, ...files]);
+    setImagePreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeImage = (index: number) => {
+    URL.revokeObjectURL(imagePreviews[index]);
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadImages = async (): Promise<string[]> => {
+    if (imageFiles.length === 0) return [];
+    
+    setUploadingImages(true);
+    const uploadedUrls: string[] = [];
+
+    try {
+      for (const file of imageFiles) {
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          uploadedUrls.push(result.url);
+        } else {
+          console.error('Upload failed for file:', file.name);
+        }
+      }
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      toast({
+        title: "Upload failed",
+        description: "Some images failed to upload",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImages(false);
+    }
+
+    return uploadedUrls;
+  };
+
   const onSubmit = async (data: ProductForm) => {
+    // Upload images first
+    const uploadedImageUrls = await uploadImages();
+    const finalData = {
+      ...data,
+      images: [...(data.images || []), ...uploadedImageUrls],
+    };
+
     if (editingProduct) {
-      updateProductMutation.mutate({ id: editingProduct.id, data });
+      updateProductMutation.mutate({ id: editingProduct.id, data: finalData });
     } else {
-      createProductMutation.mutate(data);
+      createProductMutation.mutate(finalData);
     }
   };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
+    // Clear any previous upload state
+    clearImageState();
     form.reset({
       name: product.name,
       slug: product.slug,
@@ -185,6 +265,14 @@ export default function AdminProducts() {
       colors: product.colors || [],
       inventory: product.inventory || 0,
     });
+  };
+
+  const clearImageState = () => {
+    // Clean up preview URLs
+    imagePreviews.forEach(url => URL.revokeObjectURL(url));
+    setImageFiles([]);
+    setImagePreviews([]);
+    setUploadingImages(false);
   };
 
   const handleDelete = async (productId: string) => {
@@ -364,6 +452,70 @@ export default function AdminProducts() {
                     )}
                   />
 
+                  {/* Image Upload Section */}
+                  <div className="space-y-4">
+                    <FormLabel>Product Images (Up to 5)</FormLabel>
+                    
+                    {/* Image Upload Input */}
+                    <div className="flex items-center gap-4">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                        disabled={imageFiles.length >= 5}
+                        className="file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                        data-testid="input-product-images"
+                      />
+                      <Badge variant="outline">
+                        {imageFiles.length}/5 images
+                      </Badge>
+                    </div>
+
+                    {/* Image Previews */}
+                    {imagePreviews.length > 0 && (
+                      <div className="grid grid-cols-3 gap-4">
+                        {imagePreviews.map((preview, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={preview}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-md border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => removeImage(index)}
+                              data-testid={`button-remove-image-${index}`}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Existing Images (for edit mode) */}
+                    {editingProduct && editingProduct.images && editingProduct.images.length > 0 && (
+                      <div className="space-y-2">
+                        <FormLabel>Current Images</FormLabel>
+                        <div className="grid grid-cols-3 gap-4">
+                          {editingProduct.images.map((imageUrl, index) => (
+                            <div key={index} className="relative">
+                              <img
+                                src={imageUrl}
+                                alt={`Current image ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-md border"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="flex justify-end space-x-2">
                     <Button
                       type="button"
@@ -371,6 +523,7 @@ export default function AdminProducts() {
                       onClick={() => {
                         setIsCreateOpen(false);
                         setEditingProduct(null);
+                        clearImageState();
                         form.reset();
                       }}
                       data-testid="button-cancel"
@@ -379,10 +532,12 @@ export default function AdminProducts() {
                     </Button>
                     <Button
                       type="submit"
-                      disabled={createProductMutation.isPending || updateProductMutation.isPending}
+                      disabled={createProductMutation.isPending || updateProductMutation.isPending || uploadingImages}
                       data-testid="button-save-product"
                     >
-                      {createProductMutation.isPending || updateProductMutation.isPending
+                      {uploadingImages
+                        ? "Uploading Images..."
+                        : createProductMutation.isPending || updateProductMutation.isPending
                         ? "Saving..."
                         : editingProduct
                         ? "Update Product"
