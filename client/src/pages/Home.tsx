@@ -12,10 +12,11 @@ function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   
   const heroImages = [
-    "/attached_assets/384b3062-2d12-48c0-b609-fcd2a658bdc2_1757360568530.png",
-    "/attached_assets/425cc7e3-7984-4e75-9d76-4008deaf672e_1757360568531.png",
-    "/attached_assets/fotball_1757360568532.png",
-    "/attached_assets/WhatsApp Image 2025-08-28 at 15.56.51_6f331cbc_1757360568532.jpg"
+    "/attached_assets/imgi_6_default_1757362105659.jpg",
+    "/attached_assets/imgi_17_default_1757362105660.jpg",
+    "/attached_assets/imgi_33_default_1757362105661.jpg",
+    "/attached_assets/imgi_37_default_1757362105661.jpg",
+    "/attached_assets/imgi_51_default_1757362105662.jpg"
   ];
 
   const { data: products } = useQuery({
