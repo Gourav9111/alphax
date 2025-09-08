@@ -165,27 +165,27 @@ function Home() {
       </section>
 
       {/* Choose Your Sports Categories */}
-      <section className="py-16 bg-white">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Choose Your Sports</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">Choose Your Sports</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
               Professional jerseys for every sport. From cricket to esports, we've got you covered.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {customCategories.map((category, index) => (
               <Link key={category.id} href={`/category/${category.slug}`}>
-                <Card className="group cursor-pointer border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <Card className="group cursor-pointer border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
                   <div className="aspect-square relative overflow-hidden">
                     <img 
-                      src={category.image || `/api/placeholder/300/300`} 
+                      src={`/api/placeholder/300/300`} 
                       alt={category.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-primary/60 transition-all duration-300"></div>
-                    <div className="absolute bottom-4 left-4 text-white">
-                      <h3 className="font-bold text-lg">{category.name}</h3>
+                    <div className="absolute bottom-3 left-3 text-white">
+                      <h3 className="font-bold text-sm md:text-lg">{category.name}</h3>
                     </div>
                   </div>
                 </Card>
