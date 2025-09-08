@@ -81,10 +81,10 @@ export class MemStorage implements IStorage {
       { name: "Marathon", slug: "marathon", isPrimary: true, image: "/attached_assets/marathon%20jersey%20ksmio_1757357415582.png" },
       { name: "Cycling", slug: "cycling", isPrimary: true, image: "/attached_assets/cyclist_1757357415581.png" },
       { name: "Bikers", slug: "bikers", isPrimary: true, image: "/attached_assets/biker%20jersy%20kamio_1757357415580.jfif" },
-      { name: "Custom Flags", slug: "custom-flags", isPrimary: false, image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" },
-      { name: "Corporate Gifts", slug: "corporate-gifts", isPrimary: false, image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" },
-      { name: "Corporate Uniforms", slug: "corporate-uniforms", isPrimary: false, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" },
-      { name: "Stickers", slug: "stickers", isPrimary: false, image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300" },
+      { name: "Custom Flags", slug: "custom-flags", isPrimary: false, image: "/attached_assets/KAMIO%20FLAGS_1757366547552.png" },
+      { name: "Corporate Gifts", slug: "corporate-gifts", isPrimary: false, image: "/attached_assets/GIFT%20ITEM%20KAMIO_1757366547551.png" },
+      { name: "Corporate Uniforms", slug: "corporate-uniforms", isPrimary: false, image: "/attached_assets/uniform%20kamio_1757366547552.png" },
+      { name: "Stickers", slug: "stickers", isPrimary: false, image: "/attached_assets/STICKERS%20KAMIO_1757366547552.png" },
     ];
 
     for (const cat of categories) {
