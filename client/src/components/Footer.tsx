@@ -68,16 +68,24 @@ export default function Footer() {
             </ul>
           </div>
           
-          {/* Support */}
+          {/* Contact Info */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Support</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-muted hover:text-primary transition-colors" data-testid="link-footer-help">Help Center</a></li>
-              <li><a href="#" className="text-muted hover:text-primary transition-colors" data-testid="link-footer-size">Size Guide</a></li>
-              <li><a href="#" className="text-muted hover:text-primary transition-colors" data-testid="link-footer-shipping">Shipping Info</a></li>
-              <li><a href="#" className="text-muted hover:text-primary transition-colors" data-testid="link-footer-returns">Returns</a></li>
-              <li><a href="#" className="text-muted hover:text-primary transition-colors" data-testid="link-footer-track">Track Order</a></li>
-            </ul>
+            <h4 className="font-semibold text-lg mb-4">Contact Info</h4>
+            <div className="space-y-3 text-sm text-muted">
+              <div>
+                <p className="font-medium text-primary mb-1">Address:</p>
+                <p>Shop No1,2,3, 2nd Floor, B-Block,</p>
+                <p>Indus Market Rd, near HDFC ATM,</p>
+                <p>Indus Towne, Ratanpur Sadak,</p>
+                <p>Bhopal, Madhya Pradesh 462043</p>
+              </div>
+              <div>
+                <p className="font-medium text-primary mb-1">Phone:</p>
+                <a href="tel:+919575990599" className="hover:text-primary transition-colors" data-testid="link-footer-phone">
+                  095759 90599
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         
