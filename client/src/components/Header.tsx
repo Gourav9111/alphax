@@ -29,6 +29,14 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+      {/* Breaking News Strip */}
+      <div className="bg-primary text-white py-2 overflow-hidden relative">
+        <div className="animate-marquee whitespace-nowrap inline-block">
+          <span className="text-sm font-medium mx-8">
+            🔥 CENTRAL INDIA'S BIGGEST PRINTING SERVICE - FREE SHIPPING ON ALL ORDERS - CUSTOM JERSEYS STARTING ₹299 - BULK ORDERS GET EXTRA DISCOUNTS
+          </span>
+        </div>
+      </div>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-3" data-testid="link-home">
