@@ -63,7 +63,7 @@ function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section - Compact Mobile-Optimized */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 md:py-12 overflow-hidden">
+      <section className="relative bg-white py-8 md:py-12 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-6 md:gap-8 items-center">
             {/* Left Content */}
@@ -74,18 +74,18 @@ function Home() {
                   CENTRAL INDIA'S BIGGEST PRINTING SERVICE
                 </Badge>
               </div>
-              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
                 <span className="text-primary">CUSTOM</span>{" "}
-                <span className="text-yellow-400">JERSEYS</span>
+                <span className="text-yellow-600">JERSEYS</span>
                 <br className="hidden md:block" />
-                <span className="text-white">& SPORTSWEAR</span>
+                <span className="text-gray-900">& SPORTSWEAR</span>
               </h1>
-              <p className="text-sm md:text-base text-gray-300 mb-6 max-w-lg mx-auto lg:mx-0">
+              <p className="text-sm md:text-base text-gray-600 mb-6 max-w-lg mx-auto lg:mx-0">
                 Professional jerseys for{" "}
-                <span className="font-semibold text-white">Cricket</span>,{" "}
-                <span className="font-semibold text-white">Football</span>,{" "}
-                <span className="font-semibold text-white">E-Sports</span>,{" "}
-                <span className="font-semibold text-white">Biker</span> & more
+                <span className="font-semibold text-gray-900">Cricket</span>,{" "}
+                <span className="font-semibold text-gray-900">Football</span>,{" "}
+                <span className="font-semibold text-gray-900">E-Sports</span>,{" "}
+                <span className="font-semibold text-gray-900">Biker</span> & more
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link href="/customize">
