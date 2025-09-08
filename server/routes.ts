@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
@@ -7,13 +7,26 @@ import { fileURLToPath } from "url";
 import { storage } from "./storage.js";
 import { insertUserSchema, insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema } from "@shared/schema";
 
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        userId: string;
+        email: string;
+        role: string;
+      };
+    }
+  }
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || "kamio-secret-key";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware to verify JWT token
-function authenticateToken(req: any, res: any, next: any) {
+function authenticateToken(req: Request, res: Response, next: Function) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -29,8 +42,8 @@ function authenticateToken(req: any, res: any, next: any) {
 }
 
 // Middleware to check admin role
-function requireAdmin(req: any, res: any, next: any) {
-  if (req.user.role !== 'admin') {
+function requireAdmin(req: Request, res: Response, next: Function) {
+  if (req.user?.role !== 'admin') {
     return res.status(403).json({ message: 'Admin access required' });
   }
   next();

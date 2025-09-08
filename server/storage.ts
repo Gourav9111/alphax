@@ -1,6 +1,27 @@
-import { type User, type InsertUser, type Category, type InsertCategory, type Product, type InsertProduct, type CartItem, type InsertCartItem, type Order, type InsertOrder, type CustomDesign, type InsertCustomDesign } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { eq, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { 
+  users, 
+  categories, 
+  products, 
+  cartItems, 
+  orders, 
+  customDesigns, 
+  type User, 
+  type InsertUser, 
+  type Category, 
+  type InsertCategory, 
+  type Product, 
+  type InsertProduct, 
+  type CartItem, 
+  type InsertCartItem, 
+  type Order, 
+  type InsertOrder, 
+  type CustomDesign, 
+  type InsertCustomDesign 
+} from "@shared/schema";
 
 export interface IStorage {
   // Users
@@ -41,449 +62,197 @@ export interface IStorage {
   createCustomDesign(design: InsertCustomDesign): Promise<CustomDesign>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private categories: Map<string, Category>;
-  private products: Map<string, Product>;
-  private cartItems: Map<string, CartItem>;
-  private orders: Map<string, Order>;
-  private customDesigns: Map<string, CustomDesign>;
+// Initialize database connection
+const sql = neon(process.env.DATABASE_URL!);
+const db = drizzle(sql);
 
+export class DatabaseStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.categories = new Map();
-    this.products = new Map();
-    this.cartItems = new Map();
-    this.orders = new Map();
-    this.customDesigns = new Map();
-
     this.seedData();
   }
 
   private async seedData() {
-    // Create admin user
-    const adminId = randomUUID();
-    const adminUser: User = {
-      id: adminId,
-      email: "admin@kamio.in",
-      password: await bcrypt.hash("kamio9111", 10),
-      name: "Admin User",
-      role: "admin",
-      createdAt: new Date(),
-    };
-    this.users.set(adminId, adminUser);
+    try {
+      // Check if categories already exist
+      const existingCategories = await db.select().from(categories).limit(1);
+      if (existingCategories.length > 0) {
+        console.log("Database already seeded");
+        return;
+      }
 
-    // Seed categories
-    const categories = [
-      { name: "Cricket", slug: "cricket", isPrimary: true, image: "/attached_assets/cricket%20jersey_1757357415580.png" },
-      { name: "Football", slug: "football", isPrimary: true, image: "/attached_assets/fotball%20jersey%20image_1757357415582.png" },
-      { name: "E-Sports", slug: "esports", isPrimary: true, image: "/attached_assets/esports%20kamio_1757357415581.png" },
-      { name: "Marathon", slug: "marathon", isPrimary: true, image: "/attached_assets/marathon%20jersey%20ksmio_1757357415582.png" },
-      { name: "Cycling", slug: "cycling", isPrimary: true, image: "/attached_assets/cyclist_1757357415581.png" },
-      { name: "Bikers", slug: "bikers", isPrimary: true, image: "/attached_assets/biker%20jersy%20kamio_1757357415580.jfif" },
-      { name: "Custom Flags", slug: "custom-flags", isPrimary: false, image: "/attached_assets/KAMIO%20FLAGS_1757366547552.png" },
-      { name: "Corporate Gifts", slug: "corporate-gifts", isPrimary: false, image: "/attached_assets/GIFT%20ITEM%20KAMIO_1757366547551.png" },
-      { name: "Corporate Uniforms", slug: "corporate-uniforms", isPrimary: false, image: "/attached_assets/uniform%20kamio_1757366547552.png" },
-      { name: "Stickers", slug: "stickers", isPrimary: false, image: "/attached_assets/STICKERS%20KAMIO_1757366547552.png" },
-    ];
+      console.log("Seeding database...");
 
-    for (const cat of categories) {
-      const categoryId = randomUUID();
-      const category: Category = {
-        id: categoryId,
-        ...cat,
-        description: `High-quality ${cat.name.toLowerCase()} apparel`,
-        createdAt: new Date(),
-      };
-      this.categories.set(categoryId, category);
-    }
+      // Seed categories
+      const categoryData = [
+        { name: "Cricket", slug: "cricket", isPrimary: true, image: "/attached_assets/cricket%20jersey_1757357415580.png", description: "High-quality cricket apparel" },
+        { name: "Football", slug: "football", isPrimary: true, image: "/attached_assets/fotball%20jersey%20image_1757357415582.png", description: "High-quality football apparel" },
+        { name: "E-Sports", slug: "esports", isPrimary: true, image: "/attached_assets/esports%20kamio_1757357415581.png", description: "High-quality esports apparel" },
+        { name: "Marathon", slug: "marathon", isPrimary: true, image: "/attached_assets/marathon%20jersey%20ksmio_1757357415582.png", description: "High-quality marathon apparel" },
+        { name: "Cycling", slug: "cycling", isPrimary: true, image: "/attached_assets/cyclist_1757357415581.png", description: "High-quality cycling apparel" },
+        { name: "Bikers", slug: "bikers", isPrimary: true, image: "/attached_assets/biker%20jersy%20kamio_1757357415580.jfif", description: "High-quality biker apparel" },
+        { name: "Custom Flags", slug: "custom-flags", isPrimary: false, image: "/attached_assets/KAMIO%20FLAGS_1757366547552.png", description: "High-quality custom flags" },
+        { name: "Corporate Gifts", slug: "corporate-gifts", isPrimary: false, image: "/attached_assets/GIFT%20ITEM%20KAMIO_1757366547551.png", description: "High-quality corporate gifts" },
+        { name: "Corporate Uniforms", slug: "corporate-uniforms", isPrimary: false, image: "/attached_assets/uniform%20kamio_1757366547552.png", description: "High-quality corporate uniforms" },
+        { name: "Stickers", slug: "stickers", isPrimary: false, image: "/attached_assets/STICKERS%20KAMIO_1757366547552.png", description: "High-quality stickers" },
+      ];
 
-    // Seed some products
-    const esportsCategory = Array.from(this.categories.values()).find(c => c.slug === "esports");
-    const cricketCategory = Array.from(this.categories.values()).find(c => c.slug === "cricket");
-
-    if (esportsCategory) {
-      const product1Id = randomUUID();
-      const product1: Product = {
-        id: product1Id,
-        name: "Gaming Pro Jersey",
-        slug: "gaming-pro-jersey",
-        description: "Custom esports jersey with premium fabric",
-        price: "549",
-        originalPrice: "699",
-        categoryId: esportsCategory.id,
-        images: ["https://pixabay.com/get/g4247551d5d483f87470f7cf6d7eafdb1c2c50f0cf15376cccaa5d84986fa0cd98c74287f34c70e75b4c89ba066ba6172b1054e830dd91e910df98dc4d7f1fdd4_1280.jpg"],
-        sizes: ["XS", "S", "M", "L", "XL"],
-        colors: ["Black", "White", "Red", "Blue"],
-        inventory: 50,
-        rating: "4.8",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(product1Id, product1);
-    }
-
-    if (cricketCategory) {
-      const product2Id = randomUUID();
-      const product2: Product = {
-        id: product2Id,
-        name: "Cricket Team Jersey",
-        slug: "cricket-team-jersey",
-        description: "Professional cricket uniform with custom printing",
-        price: "649",
-        originalPrice: "799",
-        categoryId: cricketCategory.id,
-        images: ["https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=600"],
-        sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-        colors: ["White", "Blue", "Green"],
-        inventory: 30,
-        rating: "4.9",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(product2Id, product2);
-    }
-
-    // Add Biker products
-    const bikerCategory = Array.from(this.categories.values()).find(c => c.slug === "bikers");
-
-    if (bikerCategory) {
-      // KAMIO Racing Jersey
-      const bikerProduct1Id = randomUUID();
-      const bikerProduct1: Product = {
-        id: bikerProduct1Id,
-        name: "KAMIO Racing Jersey",
-        slug: "kamio-racing-jersey",
-        description: "Premium cycling jersey with aerodynamic design and moisture-wicking fabric. Features the iconic KAMIO branding with red accents.",
-        price: "899",
-        originalPrice: "1199",
-        categoryId: bikerCategory.id,
-        images: ["/api/images/WhatsApp%20Image%202025-08-28%20at%2015.56.51_6f331cbc_1757350633571.jpg"],
-        sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-        colors: ["Black", "White", "Red"],
-        inventory: 25,
-        rating: "4.9",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(bikerProduct1Id, bikerProduct1);
-
-      // KAMIO Protective Biker Suit
-      const bikerProduct2Id = randomUUID();
-      const bikerProduct2: Product = {
-        id: bikerProduct2Id,
-        name: "KAMIO Protective Biker Suit",
-        slug: "kamio-protective-biker-suit",
-        description: "Professional grade protective biker gear with CE-approved armor. Ultimate safety meets style with KAMIO's signature design.",
-        price: "2899",
-        originalPrice: "3499",
-        categoryId: bikerCategory.id,
-        images: ["/api/images/WhatsApp%20Image%202025-08-28%20at%2015.56.51_9a18ab62_1757350633572.jpg"],
-        sizes: ["S", "M", "L", "XL", "XXL"],
-        colors: ["Black", "Gray", "Red"],
-        inventory: 15,
-        rating: "4.8",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(bikerProduct2Id, bikerProduct2);
-
-      // KAMIO Wings Sports Gear
-      const bikerProduct3Id = randomUUID();
-      const bikerProduct3: Product = {
-        id: bikerProduct3Id,
-        name: "KAMIO Wings Sports Gear",
-        slug: "kamio-wings-sports-gear",
-        description: "Elite motorsport apparel featuring the distinctive KAMIO wings logo. Perfect for track days and competitive racing.",
-        price: "1599",
-        originalPrice: "1999",
-        categoryId: bikerCategory.id,
-        images: ["/api/images/WhatsApp%20Image%202025-08-28%20at%2015.56.51_24d14876_1757350633572.jpg"],
-        sizes: ["XS", "S", "M", "L", "XL"],
-        colors: ["Black", "Teal", "White"],
-        inventory: 20,
-        rating: "4.7",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(bikerProduct3Id, bikerProduct3);
-
-      // KAMIO Winter Biker Jacket
-      const bikerProduct4Id = randomUUID();
-      const bikerProduct4: Product = {
-        id: bikerProduct4Id,
-        name: "KAMIO Winter Biker Jacket",
-        slug: "kamio-winter-biker-jacket",
-        description: "Insulated winter riding jacket with weather protection and reflective elements. Keep warm while staying visible on cold rides.",
-        price: "1299",
-        originalPrice: "1699",
-        categoryId: bikerCategory.id,
-        images: ["/api/images/WhatsApp%20Image%202025-08-28%20at%2015.56.51_6853b79c_1757350633573.jpg"],
-        sizes: ["S", "M", "L", "XL", "XXL"],
-        colors: ["Black", "Red", "White"],
-        inventory: 18,
-        rating: "4.6",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(bikerProduct4Id, bikerProduct4);
-
-      // KAMIO Eagle Sports Jersey
-      const bikerProduct5Id = randomUUID();
-      const bikerProduct5: Product = {
-        id: bikerProduct5Id,
-        name: "KAMIO Eagle Sports Jersey",
-        slug: "kamio-eagle-sports-jersey",
-        description: "Bold sports jersey with striking eagle design and geometric patterns. Made from high-performance fabric for maximum comfort.",
-        price: "749",
-        originalPrice: "999",
-        categoryId: bikerCategory.id,
-        images: ["/api/images/WhatsApp%20Image%202025-08-28%20at%2015.56.51_45376b86_1757350633573.jpg"],
-        sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-        colors: ["Black", "White", "Gray"],
-        inventory: 30,
-        rating: "4.8",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(bikerProduct5Id, bikerProduct5);
-
-      // KAMIO Pro Racing Suit
-      const bikerProduct6Id = randomUUID();
-      const bikerProduct6: Product = {
-        id: bikerProduct6Id,
-        name: "KAMIO Pro Racing Suit",
-        slug: "kamio-pro-racing-suit",
-        description: "Advanced racing suit with ergonomic design and superior protection. Features cutting-edge materials and championship-level performance.",
-        price: "3299",
-        originalPrice: "3999",
-        categoryId: bikerCategory.id,
-        images: ["/api/images/WhatsApp%20Image%202025-08-28%20at%2015.56.51_b3af2892_1757350633574.jpg"],
-        sizes: ["S", "M", "L", "XL"],
-        colors: ["Black", "Silver", "Red"],
-        inventory: 12,
-        rating: "4.9",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(bikerProduct6Id, bikerProduct6);
-
-      // KAMIO Teal Racing Jersey
-      const bikerProduct7Id = randomUUID();
-      const bikerProduct7: Product = {
-        id: bikerProduct7Id,
-        name: "KAMIO Teal Racing Jersey",
-        slug: "kamio-teal-racing-jersey",
-        description: "Vibrant teal racing jersey with dynamic geometric patterns. Ultra-lightweight and breathable for peak performance.",
-        price: "849",
-        originalPrice: "1099",
-        categoryId: bikerCategory.id,
-        images: ["/api/images/WhatsApp%20Image%202025-08-28%20at%2015.56.51_e566bdfc_1757350633574.jpg"],
-        sizes: ["XS", "S", "M", "L", "XL"],
-        colors: ["Teal", "Black", "White"],
-        inventory: 22,
-        rating: "4.7",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(bikerProduct7Id, bikerProduct7);
-
-      // KAMIO Sport Performance Jersey
-      const bikerProduct8Id = randomUUID();
-      const bikerProduct8: Product = {
-        id: bikerProduct8Id,
-        name: "KAMIO Sport Performance Jersey",
-        slug: "kamio-sport-performance-jersey",
-        description: "Classic white performance jersey with bold black stripe design. Perfect for training sessions and competitive events.",
-        price: "599",
-        originalPrice: "799",
-        categoryId: bikerCategory.id,
-        images: ["/api/images/WhatsApp%20Image%202025-08-28%20at%2015.56.51_6ddb56be_1757350633571.jpg"],
-        sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-        colors: ["White", "Black", "Gray"],
-        inventory: 35,
-        rating: "4.5",
-        isActive: true,
-        createdAt: new Date(),
-      };
-      this.products.set(bikerProduct8Id, bikerProduct8);
+      await db.insert(categories).values(categoryData);
+      console.log("Categories seeded successfully");
+    } catch (error) {
+      console.error("Error seeding database:", error);
     }
   }
 
   // User methods
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const hashedPassword = await bcrypt.hash(insertUser.password, 10);
-    const user: User = {
-      ...insertUser,
-      id,
+  async createUser(userData: InsertUser): Promise<User> {
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const [user] = await db.insert(users).values({
+      ...userData,
       password: hashedPassword,
-      createdAt: new Date(),
-    };
-    this.users.set(id, user);
+      role: userData.role || "user"
+    }).returning();
     return user;
   }
 
   async getAllUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
+    return await db.select().from(users);
   }
 
   async deleteUser(id: string): Promise<boolean> {
-    return this.users.delete(id);
+    const result = await db.delete(users).where(eq(users.id, id));
+    return result.rowCount > 0;
   }
 
   // Category methods
   async getCategories(): Promise<Category[]> {
-    return Array.from(this.categories.values());
+    return await db.select().from(categories).orderBy(categories.isPrimary, categories.name);
   }
 
   async getCategoryBySlug(slug: string): Promise<Category | undefined> {
-    return Array.from(this.categories.values()).find(cat => cat.slug === slug);
+    const result = await db.select().from(categories).where(eq(categories.slug, slug)).limit(1);
+    return result[0];
   }
 
-  async createCategory(insertCategory: InsertCategory): Promise<Category> {
-    const id = randomUUID();
-    const category: Category = {
-      ...insertCategory,
-      id,
-      createdAt: new Date(),
-    };
-    this.categories.set(id, category);
+  async createCategory(categoryData: InsertCategory): Promise<Category> {
+    const [category] = await db.insert(categories).values(categoryData).returning();
     return category;
   }
 
   // Product methods
   async getProducts(categoryId?: string): Promise<Product[]> {
-    const products = Array.from(this.products.values());
     if (categoryId) {
-      return products.filter(p => p.categoryId === categoryId && p.isActive);
+      return await db.select().from(products).where(eq(products.categoryId, categoryId)).orderBy(desc(products.createdAt));
     }
-    return products.filter(p => p.isActive);
+    return await db.select().from(products).orderBy(desc(products.createdAt));
   }
 
   async getProduct(id: string): Promise<Product | undefined> {
-    return this.products.get(id);
+    const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+    return result[0];
   }
 
   async getProductBySlug(slug: string): Promise<Product | undefined> {
-    return Array.from(this.products.values()).find(p => p.slug === slug);
+    const result = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+    return result[0];
   }
 
-  async createProduct(insertProduct: InsertProduct): Promise<Product> {
-    const id = randomUUID();
-    const product: Product = {
-      ...insertProduct,
-      id,
-      createdAt: new Date(),
-    };
-    this.products.set(id, product);
+  async createProduct(productData: InsertProduct): Promise<Product> {
+    const [product] = await db.insert(products).values(productData).returning();
     return product;
   }
 
-  async updateProduct(id: string, updates: Partial<Product>): Promise<Product | undefined> {
-    const product = this.products.get(id);
-    if (!product) return undefined;
-
-    const updatedProduct = { ...product, ...updates };
-    this.products.set(id, updatedProduct);
-    return updatedProduct;
+  async updateProduct(id: string, productData: Partial<Product>): Promise<Product | undefined> {
+    const [product] = await db.update(products).set(productData).where(eq(products.id, id)).returning();
+    return product;
   }
 
   async deleteProduct(id: string): Promise<boolean> {
-    return this.products.delete(id);
+    const result = await db.delete(products).where(eq(products.id, id));
+    return result.rowCount > 0;
   }
 
   // Cart methods
   async getCartItems(userId: string): Promise<CartItem[]> {
-    return Array.from(this.cartItems.values()).filter(item => item.userId === userId);
+    return await db.select().from(cartItems).where(eq(cartItems.userId, userId)).orderBy(desc(cartItems.createdAt));
   }
 
-  async addToCart(insertCartItem: InsertCartItem): Promise<CartItem> {
-    const id = randomUUID();
-    const cartItem: CartItem = {
-      ...insertCartItem,
-      id,
-      createdAt: new Date(),
-    };
-    this.cartItems.set(id, cartItem);
+  async addToCart(cartItemData: InsertCartItem): Promise<CartItem> {
+    // Check if item already exists in cart
+    const existingItem = await db.select().from(cartItems)
+      .where(eq(cartItems.userId, cartItemData.userId!))
+      .where(eq(cartItems.productId, cartItemData.productId!))
+      .limit(1);
+
+    if (existingItem.length > 0) {
+      // Update quantity
+      const [updatedItem] = await db.update(cartItems)
+        .set({ quantity: existingItem[0].quantity + (cartItemData.quantity || 1) })
+        .where(eq(cartItems.id, existingItem[0].id))
+        .returning();
+      return updatedItem;
+    }
+
+    const [cartItem] = await db.insert(cartItems).values(cartItemData).returning();
     return cartItem;
   }
 
   async updateCartItem(id: string, updates: Partial<CartItem>): Promise<CartItem | undefined> {
-    const item = this.cartItems.get(id);
-    if (!item) return undefined;
-
-    const updatedItem = { ...item, ...updates };
-    this.cartItems.set(id, updatedItem);
-    return updatedItem;
+    const [cartItem] = await db.update(cartItems).set(updates).where(eq(cartItems.id, id)).returning();
+    return cartItem;
   }
 
   async removeFromCart(id: string): Promise<boolean> {
-    return this.cartItems.delete(id);
+    const result = await db.delete(cartItems).where(eq(cartItems.id, id));
+    return result.rowCount > 0;
   }
 
   async clearCart(userId: string): Promise<boolean> {
-    const userItems = Array.from(this.cartItems.entries()).filter(([_, item]) => item.userId === userId);
-    userItems.forEach(([id]) => this.cartItems.delete(id));
-    return true;
+    const result = await db.delete(cartItems).where(eq(cartItems.userId, userId));
+    return result.rowCount >= 0;
   }
 
   // Order methods
   async getOrders(userId?: string): Promise<Order[]> {
-    const orders = Array.from(this.orders.values());
     if (userId) {
-      return orders.filter(order => order.userId === userId);
+      return await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.createdAt));
     }
-    return orders;
+    return await db.select().from(orders).orderBy(desc(orders.createdAt));
   }
 
   async getOrder(id: string): Promise<Order | undefined> {
-    return this.orders.get(id);
+    const result = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+    return result[0];
   }
 
-  async createOrder(insertOrder: InsertOrder): Promise<Order> {
-    const id = randomUUID();
-    const order: Order = {
-      ...insertOrder,
-      id,
-      createdAt: new Date(),
-    };
-    this.orders.set(id, order);
+  async createOrder(orderData: InsertOrder): Promise<Order> {
+    const [order] = await db.insert(orders).values(orderData).returning();
     return order;
   }
 
   async updateOrderStatus(id: string, status: string): Promise<Order | undefined> {
-    const order = this.orders.get(id);
-    if (!order) return undefined;
-
-    const updatedOrder = { ...order, status };
-    this.orders.set(id, updatedOrder);
-    return updatedOrder;
+    const [order] = await db.update(orders).set({ status }).where(eq(orders.id, id)).returning();
+    return order;
   }
 
-  // Custom Design methods
+  // Custom design methods
   async getCustomDesigns(userId: string): Promise<CustomDesign[]> {
-    return Array.from(this.customDesigns.values()).filter(design => design.userId === userId);
+    return await db.select().from(customDesigns).where(eq(customDesigns.userId, userId)).orderBy(desc(customDesigns.createdAt));
   }
 
-  async createCustomDesign(insertDesign: InsertCustomDesign): Promise<CustomDesign> {
-    const id = randomUUID();
-    const design: CustomDesign = {
-      ...insertDesign,
-      id,
-      createdAt: new Date(),
-    };
-    this.customDesigns.set(id, design);
+  async createCustomDesign(designData: InsertCustomDesign): Promise<CustomDesign> {
+    const [design] = await db.insert(customDesigns).values(designData).returning();
     return design;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
