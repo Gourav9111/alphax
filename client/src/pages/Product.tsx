@@ -33,8 +33,14 @@ export default function ProductPage() {
         throw new Error("Please login to add items to cart");
       }
       
-      if (!selectedSize || !selectedColor) {
-        throw new Error("Please select size and color");
+      // Only require size if product has sizes
+      if (product?.sizes && product.sizes.length > 0 && !selectedSize) {
+        throw new Error("Please select a size");
+      }
+      
+      // Only require color if product has colors
+      if (product?.colors && product.colors.length > 0 && !selectedColor) {
+        throw new Error("Please select a color");
       }
       
       const options = createAuthenticatedRequest("/api/cart", {
