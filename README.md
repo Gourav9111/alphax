@@ -68,9 +68,17 @@ GRANT ALL PRIVILEGES ON kamio_db.* TO 'kamio_user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 
-# Import the database schema
-mysql -u kamio_user -p kamio_db < /path/to/database/kamio_schema.sql
+# Import the database schema (this will create all tables and sample data)
+mysql -u kamio_user -p kamio_db < /var/www/kamio/database/kamio_schema.sql
 ```
+
+**Database Schema Overview:**
+The `database/kamio_schema.sql` file contains:
+- Complete database structure with all required tables
+- Sample categories (Cricket, Football, E-Sports, Marathon, Cycling, Bikers, etc.)
+- Sample products for each category
+- Admin user account (admin@kamio.com / admin123456)
+- Proper indexes for performance optimization
 
 ### Step 3: Clone and Setup Application
 
@@ -106,12 +114,15 @@ Add the following environment variables:
 NODE_ENV=production
 PORT=5000
 
-# MySQL Database Configuration
+# MySQL Database Configuration (must match your database setup)
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
 MYSQL_USER=kamio_user
 MYSQL_PASSWORD=your_strong_password
 MYSQL_DATABASE=kamio_db
+
+# Database URL (alternative format for Drizzle ORM)
+DATABASE_URL=mysql://kamio_user:your_strong_password@localhost:3306/kamio_db
 
 # JWT Secret (generate a strong secret)
 JWT_SECRET=your_super_secret_jwt_key_here
@@ -348,6 +359,9 @@ npm install
 cp .env.example .env
 # Edit .env with your local MySQL credentials
 
+# Import database schema locally
+mysql -u your_local_user -p your_local_database < database/kamio_schema.sql
+
 # Start development server
 npm run dev
 ```
@@ -391,6 +405,34 @@ sudo systemctl status mysql
 mysqldump -u kamio_user -p kamio_db > backup_$(date +%Y%m%d).sql
 ```
 
+### Step 10: Database Verification
+
+After importing the schema, verify the database setup:
+
+```bash
+# Login to MySQL and verify tables
+mysql -u kamio_user -p kamio_db
+
+# Check if all tables are created
+SHOW TABLES;
+
+# Verify sample data
+SELECT COUNT(*) FROM categories;
+SELECT COUNT(*) FROM products; 
+SELECT * FROM users WHERE role = 'admin';
+
+# Exit MySQL
+EXIT;
+```
+
+You should see these tables:
+- `users` (with admin user)
+- `categories` (with 10 sample categories)
+- `products` (with sample products)
+- `cart_items`
+- `orders`
+- `custom_designs`
+
 ## Troubleshooting
 
 ### Common Issues
@@ -405,11 +447,16 @@ mysqldump -u kamio_user -p kamio_db > backup_$(date +%Y%m%d).sql
    - Check credentials in `.env`
    - Ensure database exists
 
-3. **SSL issues**:
+3. **Database schema issues**:
+   - Re-import schema: `mysql -u kamio_user -p kamio_db < /var/www/kamio/database/kamio_schema.sql`
+   - Check table structure: `DESCRIBE users;` (in MySQL console)
+   - Verify admin user exists: `SELECT * FROM users WHERE role='admin';`
+
+4. **SSL issues**:
    - Renew certificate: `sudo certbot renew`
    - Check Nginx config: `sudo nginx -t`
 
-4. **File upload issues**:
+5. **File upload issues**:
    - Check directory permissions
    - Ensure `uploaded_images` directory exists
 
