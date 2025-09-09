@@ -80,7 +80,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <img
             src={product.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=600"}
             alt={product.name}
-            className="w-full h-64 object-cover product-zoom"
+            className="w-full h-64 object-contain bg-white product-zoom"
             data-testid={`img-product-${product.id}`}
           />
           <div className="absolute top-4 left-4">

@@ -182,7 +182,7 @@ function Home() {
                     <img 
                       src={category.image || `/api/placeholder/300/500`} 
                       alt={category.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-primary/60 transition-all duration-300"></div>
                     <div className="absolute bottom-3 left-3 text-white">
@@ -213,7 +213,7 @@ function Home() {
                     <img 
                       src={product.image || `/api/placeholder/300/400`} 
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 product-zoom"
+                      className="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-500 product-zoom"
                     />
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-red-500 text-white">

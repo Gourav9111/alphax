@@ -150,7 +150,7 @@ export default function ProductPage() {
               <img
                 src={images[selectedImage]}
                 alt={product.name}
-                className="w-full h-96 object-cover rounded-xl"
+                className="w-full h-96 object-contain bg-white rounded-xl border"
                 data-testid="img-product-main"
               />
             </div>
@@ -162,8 +162,8 @@ export default function ProductPage() {
                     key={index}
                     src={image}
                     alt={`${product.name} ${index + 1}`}
-                    className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 ${
-                      selectedImage === index ? "border-primary" : "border-transparent"
+                    className={`w-20 h-20 object-contain bg-white rounded-lg cursor-pointer border-2 ${
+                      selectedImage === index ? "border-primary" : "border-gray-200"
                     }`}
                     onClick={() => setSelectedImage(index)}
                     data-testid={`img-product-thumb-${index}`}
