@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Product } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isAuthenticated } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { createAuthenticatedRequest } from "@/lib/auth";
+import { useState } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -20,6 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
   const authenticated = isAuthenticated();
+  const [selectedSize, setSelectedSize] = useState<string>(product.sizes?.[0] || "M");
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
@@ -33,7 +36,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         body: JSON.stringify({
           productId: product.id,
           quantity: 1,
-          size: product.sizes?.[0] || "M",
+          size: selectedSize,
           color: product.colors?.[0] || "Default",
         }),
       });
@@ -134,6 +137,25 @@ export default function ProductCard({ product }: ProductCardProps) {
             <span data-testid={`text-product-rating-${product.id}`}>{product.rating || "4.5"}</span>
           </div>
         </div>
+        
+        {/* Size Selection */}
+        {product.sizes && product.sizes.length > 0 && (
+          <div className="mb-3">
+            <label className="text-sm font-medium text-muted-foreground block mb-2">Size:</label>
+            <Select value={selectedSize} onValueChange={setSelectedSize} data-testid={`select-size-${product.id}`}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select size" />
+              </SelectTrigger>
+              <SelectContent>
+                {product.sizes.map((size) => (
+                  <SelectItem key={size} value={size} data-testid={`option-size-${size}-${product.id}`}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         
         <Button
           onClick={handleAddToCart}
