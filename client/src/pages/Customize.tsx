@@ -127,10 +127,10 @@ export default function Customize() {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
+      if (file.size > 50 * 1024 * 1024) {
         toast({
           title: "File too large",
-          description: "Please select a file smaller than 10MB.",
+          description: "Please select a file smaller than 50MB.",
           variant: "destructive",
         });
         return;
