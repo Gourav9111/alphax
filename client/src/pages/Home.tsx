@@ -24,7 +24,7 @@ function Home() {
     queryFn: async () => {
       const response = await fetch("/api/products");
       if (!response.ok) throw new Error("Failed to fetch products");
-      return response.json() as Product[];
+      return response.json();
     },
   });
 
@@ -33,7 +33,7 @@ function Home() {
     queryFn: async () => {
       const response = await fetch("/api/categories");
       if (!response.ok) throw new Error("Failed to fetch categories");
-      return response.json() as Category[];
+      return response.json();
     },
   });
 
@@ -211,13 +211,13 @@ function Home() {
                 <Card className="group cursor-pointer border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden product-card-animation">
                   <div className="aspect-[3/4] relative overflow-hidden">
                     <img 
-                      src={product.image || `/api/placeholder/300/400`} 
+                      src={product.images?.[0] || `/api/placeholder/300/400`} 
                       alt={product.name}
                       className="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-500 product-zoom"
                     />
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-red-500 text-white">
-                        -{Math.round(((product.originalPrice || product.price) - product.price) / (product.originalPrice || product.price) * 100)}%
+                        -{Math.round(((parseFloat(product.originalPrice || product.price) - parseFloat(product.price)) / parseFloat(product.originalPrice || product.price)) * 100)}%
                       </Badge>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
