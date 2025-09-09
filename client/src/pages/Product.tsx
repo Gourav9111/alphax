@@ -209,9 +209,21 @@ export default function ProductPage() {
             </div>
 
             <div className="mb-6">
-              <p className="text-muted-foreground text-lg" data-testid="text-product-description">
+              <h3 className="text-lg font-semibold mb-3">Description</h3>
+              <p className="text-muted-foreground text-base leading-relaxed" data-testid="text-product-description">
                 {product.description}
               </p>
+              
+              <div className="mt-4 space-y-2">
+                <h4 className="font-medium">Features:</h4>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Premium quality fabric with moisture-wicking technology</li>
+                  <li>Customizable design with team logos and player names</li>
+                  <li>Professional stitching for durability</li>
+                  <li>Available in multiple sizes and colors</li>
+                  <li>Fast delivery within 7-10 business days</li>
+                </ul>
+              </div>
             </div>
 
             {/* Product Options */}
@@ -298,22 +310,35 @@ export default function ProductPage() {
             </div>
 
             {/* Product Info */}
-            <div className="mt-8 space-y-4 text-sm text-muted-foreground">
-              <div className="flex justify-between">
-                <span>SKU:</span>
-                <span data-testid="text-product-sku">{product.id.slice(0, 8).toUpperCase()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Availability:</span>
-                <span className={product.inventory && product.inventory > 0 ? "text-green-600" : "text-red-600"} data-testid="text-product-availability">
-                  {product.inventory && product.inventory > 0 ? "In Stock" : "Out of Stock"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Category:</span>
-                <span data-testid="text-product-category">Custom Apparel</span>
-              </div>
-            </div>
+            <Card className="mt-8">
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-4">Product Information</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">SKU:</span>
+                    <span className="font-medium" data-testid="text-product-sku">{product.id.slice(0, 8).toUpperCase()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Availability:</span>
+                    <span className={product.inventory && product.inventory > 0 ? "text-green-600 font-medium" : "text-red-600 font-medium"} data-testid="text-product-availability">
+                      {product.inventory && product.inventory > 0 ? `In Stock (${product.inventory} units)` : "Out of Stock"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Category:</span>
+                    <span className="font-medium" data-testid="text-product-category">Custom Sports Apparel</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Material:</span>
+                    <span className="font-medium">100% Polyester Dri-FIT</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Care:</span>
+                    <span className="font-medium">Machine Washable</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
