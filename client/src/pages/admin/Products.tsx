@@ -480,7 +480,7 @@ export default function AdminProducts() {
                             <img
                               src={preview}
                               alt={`Preview ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-md border"
+                              className="w-full aspect-[9/16] object-cover rounded-md border"
                             />
                             <Button
                               type="button"
@@ -507,7 +507,7 @@ export default function AdminProducts() {
                               <img
                                 src={imageUrl}
                                 alt={`Current image ${index + 1}`}
-                                className="w-full h-24 object-cover rounded-md border"
+                                className="w-full aspect-[9/16] object-cover rounded-md border"
                               />
                             </div>
                           ))}
@@ -592,6 +592,17 @@ export default function AdminProducts() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  {/* Product Image */}
+                  {product.images?.[0] && (
+                    <div className="mb-3">
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-full aspect-[9/16] object-cover rounded-md border"
+                        data-testid={`img-product-${product.id}`}
+                      />
+                    </div>
+                  )}
                   <p className="text-sm text-muted-foreground line-clamp-2" data-testid={`text-product-description-${product.id}`}>
                     {product.description}
                   </p>

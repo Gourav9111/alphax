@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { isAuthenticated, isAdmin, createAuthenticatedRequest } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { Package, ShoppingCart, Users, TrendingUp, Clock, CheckCircle } from "lucide-react";
@@ -201,9 +202,9 @@ export default function AdminDashboard() {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Recent Orders</CardTitle>
               <Link href="/admin/orders">
-                <Badge variant="outline" className="cursor-pointer hover:bg-muted" data-testid="link-view-all-orders">
-                  View All
-                </Badge>
+                <Button variant="default" size="lg" className="bg-[#E30613] hover:bg-[#E30613]/90 text-white" data-testid="link-view-all-orders">
+                  Manage Orders
+                </Button>
               </Link>
             </CardHeader>
             <CardContent>
@@ -250,9 +251,9 @@ export default function AdminDashboard() {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Low Stock Alert</CardTitle>
               <Link href="/admin/products">
-                <Badge variant="outline" className="cursor-pointer hover:bg-muted" data-testid="link-manage-products">
+                <Button variant="default" size="lg" className="bg-[#E30613] hover:bg-[#E30613]/90 text-white" data-testid="link-manage-products">
                   Manage Products
-                </Badge>
+                </Button>
               </Link>
             </CardHeader>
             <CardContent>
