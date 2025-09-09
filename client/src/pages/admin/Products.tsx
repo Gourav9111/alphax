@@ -205,7 +205,7 @@ export default function AdminProducts() {
         formData.append('image', file);
         
         // Get token from localStorage
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         
         const response = await fetch('/api/upload', {
           method: 'POST',
