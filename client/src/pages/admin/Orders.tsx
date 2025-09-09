@@ -64,6 +64,7 @@ const statusOptions = [
 ];
 
 export default function AdminOrders() {
+  const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const authenticated = isAuthenticated();
@@ -110,13 +111,40 @@ export default function AdminOrders() {
   if (!authenticated || !isAdminUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4" data-testid="text-access-denied">
-            Access Denied
-          </h1>
-          <p className="text-muted-foreground mb-4">
-            You don't have permission to manage orders.
-          </p>
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Package className="h-8 w-8 text-destructive" />
+            </div>
+            <h1 className="text-2xl font-bold mb-4" data-testid="text-access-denied">
+              Access Denied
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              {!authenticated 
+                ? "Please log in to access order management."
+                : "You don't have permission to manage orders. Please contact an administrator."
+              }
+            </p>
+          </div>
+          <div className="space-y-3">
+            {!authenticated ? (
+              <Button
+                onClick={() => navigate("/admin/login")}
+                className="w-full bg-[#E30613] hover:bg-[#E30613]/90 text-white"
+                data-testid="button-login-admin"
+              >
+                Go to Admin Login
+              </Button>
+            ) : (
+              <Button
+                onClick={() => navigate("/")}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                data-testid="button-home-admin"
+              >
+                Back to Home
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -238,12 +266,12 @@ export default function AdminOrders() {
                                 </p>
                                 <div className="flex space-x-2 mt-1">
                                   {item.size && (
-                                    <Badge variant="secondary" size="sm">
+                                    <Badge variant="secondary">
                                       Size: {item.size}
                                     </Badge>
                                   )}
                                   {item.color && (
-                                    <Badge variant="secondary" size="sm">
+                                    <Badge variant="secondary">
                                       Color: {item.color}
                                     </Badge>
                                   )}

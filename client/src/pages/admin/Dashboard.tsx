@@ -74,11 +74,11 @@ export default function AdminDashboard() {
           <div className="space-y-3">
             {!authenticated ? (
               <button
-                onClick={() => navigate("/login")}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 rounded-md font-medium transition-colors"
+                onClick={() => navigate("/admin/login")}
+                className="w-full bg-[#E30613] hover:bg-[#E30613]/90 text-white h-10 px-4 py-2 rounded-md font-medium transition-colors"
                 data-testid="button-login-admin"
               >
-                Go to Login
+                Go to Admin Login
               </button>
             ) : (
               <button
