@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { isAuthenticated, isAdmin, createAuthenticatedRequest } from "@/lib/auth";
-import { Package, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
+import { Package, Clock, CheckCircle, XCircle, Truck, Download } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Order {
@@ -26,6 +26,7 @@ interface Order {
       x: number;
       y: number;
       image?: string;
+      compositeImageUrl?: string;
       color: string;
       size: string;
       price: number;
@@ -273,15 +274,26 @@ export default function AdminOrders() {
                             >
                               <div className="flex justify-between items-start">
                                 <div className="flex space-x-3">
-                                  {/* Custom Design Image */}
-                                  {item.customDesign?.image && (
-                                    <div className="flex-shrink-0">
+                                  {/* Custom Design Image with Download */}
+                                  {(item.customDesign?.compositeImageUrl || item.customDesign?.image) && (
+                                    <div className="flex-shrink-0 relative group">
                                       <img
-                                        src={item.customDesign.image}
-                                        alt="Custom Design"
+                                        src={item.customDesign.compositeImageUrl || item.customDesign.image}
+                                        alt={item.customDesign.compositeImageUrl ? "Complete T-shirt Design" : "Custom Design"}
                                         className="w-16 h-16 object-cover rounded-md border"
                                         data-testid={`img-custom-design-${order.id}-${index}`}
                                       />
+                                      {/* Download Button */}
+                                      {(item.customDesign.compositeImageUrl || item.customDesign.image) && (
+                                        <a
+                                          href={item.customDesign.compositeImageUrl || item.customDesign.image}
+                                          download={`custom-design-${order.id}-${index}.png`}
+                                          className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-md"
+                                          data-testid={`button-download-${order.id}-${index}`}
+                                        >
+                                          <Download className="h-4 w-4 text-white" />
+                                        </a>
+                                      )}
                                     </div>
                                   )}
                                   <div>
@@ -301,7 +313,7 @@ export default function AdminOrders() {
                                       )}
                                       {item.customDesign && (
                                         <Badge variant="outline" className="border-orange-500 text-orange-700">
-                                          Custom Design
+                                          {item.customDesign.compositeImageUrl ? "Finished Design" : "Custom Design"}
                                         </Badge>
                                       )}
                                     </div>

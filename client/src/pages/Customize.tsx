@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { isAuthenticated, createAuthenticatedRequest } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { Upload, RotateCcw, RotateCw, ShoppingCart } from "lucide-react";
+import { Upload, RotateCcw, RotateCw, ShoppingCart, Check, Download, Edit3 } from "lucide-react";
 
 interface DesignConfig {
   scale: number;
@@ -14,6 +14,8 @@ interface DesignConfig {
   x: number;
   y: number;
   image?: string;
+  compositeImageUrl?: string; // URL of the complete t-shirt with design applied
+  isFinished?: boolean; // Track if the design has been finalized
 }
 
 export default function Customize() {
@@ -123,9 +125,11 @@ export default function Customize() {
             x: design.x,
             y: design.y,
             image: uploadedImageUrl, // Use uploaded URL instead of base64
+            compositeImageUrl: design.compositeImageUrl, // Include composite image
             color: selectedColor,
             size: selectedSize,
             price: totalPrice,
+            isFinished: design.isFinished,
           },
         }),
       });
@@ -154,6 +158,134 @@ export default function Customize() {
           variant: "destructive",
         });
       }
+    },
+  });
+
+  const captureCompositeMutation = useMutation({
+    mutationFn: async () => {
+      if (!design.image) {
+        throw new Error("Please upload a design first");
+      }
+
+      return new Promise<string>((resolve, reject) => {
+        // Create a high-resolution canvas (2x for quality)
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error("Canvas not supported");
+
+        // Set canvas size (high resolution)
+        const canvasWidth = 800;
+        const canvasHeight = 1000;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+
+        // Load the base t-shirt image
+        const baseImage = new Image();
+        baseImage.crossOrigin = "anonymous";
+        baseImage.onload = async () => {
+          try {
+            // Draw the base t-shirt
+            ctx.drawImage(baseImage, 0, 0, canvasWidth, canvasHeight);
+
+            // Load and draw the design if it exists
+            if (design.image) {
+              const designImage = new Image();
+              designImage.crossOrigin = "anonymous";
+              
+              designImage.onload = async () => {
+                // Calculate design position and size
+                const designBaseWidth = 200; // Base design size
+                const designBaseHeight = 200;
+                const scaleFactor = design.scale / 100;
+                const designWidth = designBaseWidth * scaleFactor;
+                const designHeight = designBaseHeight * scaleFactor;
+                
+                // Calculate position (center + offset)
+                const centerX = canvasWidth / 2;
+                const centerY = canvasHeight / 2 - 50; // Slightly above center for chest area
+                const designX = centerX - designWidth / 2 + (design.x * 2); // Scale x offset
+                const designY = centerY - designHeight / 2 + (design.y * 2); // Scale y offset
+
+                // Save context for rotation
+                ctx.save();
+                
+                // Translate to design center for rotation
+                ctx.translate(designX + designWidth / 2, designY + designHeight / 2);
+                
+                // Apply rotation
+                ctx.rotate((design.rotation * Math.PI) / 180);
+                
+                // Draw the design (translate back to corner)
+                ctx.drawImage(
+                  designImage,
+                  -designWidth / 2,
+                  -designHeight / 2,
+                  designWidth,
+                  designHeight
+                );
+                
+                // Restore context
+                ctx.restore();
+
+                // Convert canvas to blob and upload
+                canvas.toBlob(async (blob) => {
+                  if (!blob) {
+                    reject(new Error("Failed to generate image"));
+                    return;
+                  }
+
+                  try {
+                    // Upload the composite image
+                    const formData = new FormData();
+                    formData.append('image', blob, 'custom-tshirt-composite.png');
+                    
+                    const uploadOptions = createAuthenticatedRequest("/api/upload", {
+                      method: "POST",
+                      body: formData,
+                    });
+                    
+                    const uploadResponse = await fetch("/api/upload", uploadOptions);
+                    if (uploadResponse.ok) {
+                      const uploadResult = await uploadResponse.json();
+                      resolve(uploadResult.url);
+                    } else {
+                      reject(new Error("Failed to upload composite image"));
+                    }
+                  } catch (error) {
+                    reject(error);
+                  }
+                }, 'image/png', 0.95);
+              };
+              
+              designImage.onerror = () => reject(new Error("Failed to load design image"));
+              designImage.src = design.image;
+            }
+          } catch (error) {
+            reject(error);
+          }
+        };
+        
+        baseImage.onerror = () => reject(new Error("Failed to load base t-shirt image"));
+        baseImage.src = getTShirtImage(selectedColor, viewMode);
+      });
+    },
+    onSuccess: (compositeImageUrl: string) => {
+      setDesign(prev => ({
+        ...prev,
+        compositeImageUrl,
+        isFinished: true,
+      }));
+      toast({
+        title: "Design Finished!",
+        description: "Your custom t-shirt design has been saved successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -439,9 +571,24 @@ export default function Customize() {
                 </CardContent>
               </Card>
               
-              {/* Price & Add to Cart */}
+              {/* Design Actions & Add to Cart */}
               <Card className="border-2 border-primary/20">
                 <CardContent className="p-6">
+                  {/* Show finished design preview */}
+                  {design.isFinished && design.compositeImageUrl && (
+                    <div className="mb-4">
+                      <div className="text-sm font-medium mb-2 text-green-700">
+                        ✓ Design Finished
+                      </div>
+                      <img
+                        src={design.compositeImageUrl}
+                        alt="Finished Design"
+                        className="w-full h-48 object-contain rounded-lg border bg-muted/10"
+                        data-testid="img-finished-design"
+                      />
+                    </div>
+                  )}
+                  
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-lg font-semibold">Total Price:</span>
                     <span className="text-2xl font-bold text-primary" data-testid="text-total-price">
@@ -452,16 +599,54 @@ export default function Customize() {
                     <p>• Base price: ₹{basePrice}</p>
                     <p>• Design area: ₹{Math.max(designPrice, 0)}</p>
                   </div>
-                  <Button
-                    onClick={() => addToCartMutation.mutate()}
-                    disabled={addToCartMutation.isPending}
-                    className="w-full"
-                    size="lg"
-                    data-testid="button-add-to-cart"
-                  >
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
-                  </Button>
+                  
+                  <div className="space-y-2">
+                    {/* Finish/Edit Button */}
+                    {design.image && !design.isFinished && (
+                      <Button
+                        onClick={() => captureCompositeMutation.mutate()}
+                        disabled={captureCompositeMutation.isPending}
+                        className="w-full"
+                        size="lg"
+                        variant="outline"
+                        data-testid="button-finish-design"
+                      >
+                        <Check className="mr-2 h-4 w-4" />
+                        {captureCompositeMutation.isPending ? "Finishing..." : "Finish Design"}
+                      </Button>
+                    )}
+                    
+                    {design.isFinished && (
+                      <Button
+                        onClick={() => setDesign(prev => ({ ...prev, isFinished: false, compositeImageUrl: undefined }))}
+                        className="w-full"
+                        size="lg"
+                        variant="outline"
+                        data-testid="button-edit-design"
+                      >
+                        <Edit3 className="mr-2 h-4 w-4" />
+                        Edit Design
+                      </Button>
+                    )}
+                    
+                    {/* Add to Cart Button */}
+                    <Button
+                      onClick={() => addToCartMutation.mutate()}
+                      disabled={addToCartMutation.isPending || !design.image}
+                      className="w-full"
+                      size="lg"
+                      data-testid="button-add-to-cart"
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
+                    </Button>
+                    
+                    {!design.image && (
+                      <p className="text-xs text-muted-foreground text-center mt-2">
+                        Upload a design to add to cart
+                      </p>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>

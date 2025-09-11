@@ -86,9 +86,11 @@ export default function Checkout() {
             x: item.customDesign.x,
             y: item.customDesign.y,
             image: item.customDesign.image,
+            compositeImageUrl: item.customDesign.compositeImageUrl, // Include composite image
             color: item.customDesign.color,
             size: item.customDesign.size,
             price: item.customDesign.price,
+            isFinished: item.customDesign.isFinished,
           }
         })
       }));
