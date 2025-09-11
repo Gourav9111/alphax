@@ -15,7 +15,7 @@ export default function Header() {
   const authenticated = isAuthenticated();
 
   // Fetch cart items count
-  const { data: cartItems = [] } = useQuery({
+  const { data: cartItems = [] } = useQuery<any[]>({
     queryKey: ["/api/cart"],
     enabled: authenticated,
   });
