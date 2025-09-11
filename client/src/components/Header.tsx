@@ -39,14 +39,8 @@ export default function Header() {
       </div>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-3" data-testid="link-home">
-          <div className="w-12 h-12 md:w-14 md:h-14 bg-primary rounded-full flex items-center justify-center logo-pulse">
-            <img src={logoPath} alt="KAMIO" className="w-8 h-8 md:w-10 md:h-10 object-contain filter drop-shadow-sm" />
-          </div>
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-primary">KAMIO</h1>
-            <p className="text-xs md:text-sm text-muted-foreground">Custom Lifestyle</p>
-          </div>
+        <Link href="/" className="flex items-center" data-testid="link-home">
+          <img src={logoPath} alt="KAMIO" className="h-12 md:h-16 w-auto object-contain filter drop-shadow-sm" />
         </Link>
         
         {/* Desktop Navigation */}
