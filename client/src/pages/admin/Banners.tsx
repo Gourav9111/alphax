@@ -45,6 +45,8 @@ export default function AdminBanners() {
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const { data: banners = [], isLoading: bannersLoading } = useQuery<Banner[]>({
     queryKey: ["/api/admin/banners"],
@@ -176,6 +178,7 @@ export default function AdminBanners() {
 
   const handleEdit = (banner: Banner) => {
     setEditingBanner(banner);
+    setImagePreview(banner.image || "");
     form.reset({
       title: banner.title,
       description: banner.description,
@@ -194,9 +197,46 @@ export default function AdminBanners() {
     }
   };
 
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('/api/upload', createAuthenticatedRequest('/api/upload', {
+        method: 'POST',
+        body: formData,
+      }));
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      form.setValue('image', data.url);
+      setImagePreview(data.url);
+      
+      toast({
+        title: "Image uploaded successfully",
+        description: "Your banner image has been uploaded.",
+      });
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const closeDialog = () => {
     setIsCreateOpen(false);
     setEditingBanner(null);
+    setImagePreview("");
     form.reset();
   };
 
@@ -271,15 +311,91 @@ export default function AdminBanners() {
                   )}
                 />
 
+                {/* Image Upload Section */}
                 <FormField
                   control={form.control}
                   name="image"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="https://example.com/banner-image.jpg" data-testid="input-image-url" />
-                      </FormControl>
+                      <FormLabel>Banner Image</FormLabel>
+                      <div className="space-y-4">
+                        {/* File Upload */}
+                        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
+                          <div className="text-center">
+                            <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                disabled={uploadingImage}
+                                onClick={() => document.getElementById('banner-image-upload')?.click()}
+                                data-testid="button-upload-image"
+                              >
+                                {uploadingImage ? "Uploading..." : "Upload Image"}
+                              </Button>
+                              <span className="text-sm text-muted-foreground">or</span>
+                              <span className="text-sm text-muted-foreground">enter URL below</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              PNG, JPG, GIF up to 5MB
+                            </p>
+                          </div>
+                          <input
+                            id="banner-image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleImageUpload(file);
+                              }
+                            }}
+                          />
+                        </div>
+
+                        {/* Image Preview */}
+                        {imagePreview && (
+                          <div className="relative">
+                            <img
+                              src={imagePreview}
+                              alt="Banner preview"
+                              className="w-full h-40 object-cover rounded-lg border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute top-2 right-2"
+                              onClick={() => {
+                                setImagePreview("");
+                                form.setValue('image', "");
+                              }}
+                              data-testid="button-remove-image"
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* URL Input as Alternative */}
+                        <div>
+                          <FormLabel className="text-sm">Or enter image URL</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="https://example.com/banner-image.jpg or /api/images/filename.jpg" 
+                              data-testid="input-image-url"
+                              onChange={(e) => {
+                                field.onChange(e);
+                                if (e.target.value && !imagePreview) {
+                                  setImagePreview(e.target.value);
+                                }
+                              }}
+                            />
+                          </FormControl>
+                        </div>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
