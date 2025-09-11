@@ -40,7 +40,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center" data-testid="link-home">
-          <img src={logoPath} alt="KAMIO" className="w-16 h-16 md:w-20 md:h-20 object-contain filter drop-shadow-sm logo-pulse" />
+          <img src={logoPath} alt="KAMIO" className="w-20 h-20 md:w-28 md:h-28 object-contain filter drop-shadow-sm" />
         </Link>
         
         {/* Desktop Navigation */}
