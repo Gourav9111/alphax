@@ -131,9 +131,14 @@ export default function Checkout() {
       
       // Save address to user profile
       try {
-        const addressOptions = createAuthenticatedRequest("/api/addresses", {
+        const authRequest = createAuthenticatedRequest("/api/addresses");
+        const addressOptions = {
+          ...authRequest,
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            ...authRequest.headers,
+            "Content-Type": "application/json" 
+          },
           body: JSON.stringify({
             name: "Home", // Default address name
             fullName: `${orderData.firstName} ${orderData.lastName}`,
@@ -145,7 +150,7 @@ export default function Checkout() {
             pincode: orderData.pincode,
             isDefault: false, // Don't set as default automatically
           }),
-        });
+        };
         
         await fetch("/api/addresses", addressOptions);
         // Note: We don't throw on address save failure to avoid breaking the order flow
