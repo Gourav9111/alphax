@@ -94,31 +94,49 @@ export class DatabaseStorage implements IStorage {
 
   private async seedData() {
     try {
+      console.log("Checking database seeding...");
+
       // Check if categories already exist
       const existingCategories = await db.select().from(categories).limit(1);
-      if (existingCategories.length > 0) {
-        console.log("Database already seeded");
-        return;
+      if (existingCategories.length === 0) {
+        console.log("Seeding categories...");
+        // Seed categories
+        const categoryData = [
+          { name: "Cricket", slug: "cricket", isPrimary: true, image: "/attached_assets/cricket%20jersey_1757357415580.png", description: "High-quality cricket apparel" },
+          { name: "Football", slug: "football", isPrimary: true, image: "/attached_assets/fotball%20jersey%20image_1757357415582.png", description: "High-quality football apparel" },
+          { name: "E-Sports", slug: "esports", isPrimary: true, image: "/attached_assets/esports%20kamio_1757357415581.png", description: "High-quality esports apparel" },
+          { name: "Marathon", slug: "marathon", isPrimary: true, image: "/attached_assets/marathon%20jersey%20ksmio_1757357415582.png", description: "High-quality marathon apparel" },
+          { name: "Cycling", slug: "cycling", isPrimary: true, image: "/attached_assets/cyclist_1757357415581.png", description: "High-quality cycling apparel" },
+          { name: "Bikers", slug: "bikers", isPrimary: true, image: "/attached_assets/biker%20jersy%20kamio_1757357415580.jfif", description: "High-quality biker apparel" },
+          { name: "Custom Flags", slug: "custom-flags", isPrimary: false, image: "/attached_assets/KAMIO%20FLAGS_1757366547552.png", description: "High-quality custom flags" },
+          { name: "Corporate Gifts", slug: "corporate-gifts", isPrimary: false, image: "/attached_assets/GIFT%20ITEM%20KAMIO_1757366547551.png", description: "High-quality corporate gifts" },
+          { name: "Corporate Uniforms", slug: "corporate-uniforms", isPrimary: false, image: "/attached_assets/uniform%20kamio_1757366547552.png", description: "High-quality corporate uniforms" },
+          { name: "Stickers", slug: "stickers", isPrimary: false, image: "/attached_assets/STICKERS%20KAMIO_1757366547552.png", description: "High-quality stickers" },
+        ];
+
+        await db.insert(categories).values(categoryData);
+        console.log("Categories seeded successfully");
+      } else {
+        console.log("Categories already exist");
       }
 
-      console.log("Seeding database...");
-
-      // Seed categories
-      const categoryData = [
-        { name: "Cricket", slug: "cricket", isPrimary: true, image: "/attached_assets/cricket%20jersey_1757357415580.png", description: "High-quality cricket apparel" },
-        { name: "Football", slug: "football", isPrimary: true, image: "/attached_assets/fotball%20jersey%20image_1757357415582.png", description: "High-quality football apparel" },
-        { name: "E-Sports", slug: "esports", isPrimary: true, image: "/attached_assets/esports%20kamio_1757357415581.png", description: "High-quality esports apparel" },
-        { name: "Marathon", slug: "marathon", isPrimary: true, image: "/attached_assets/marathon%20jersey%20ksmio_1757357415582.png", description: "High-quality marathon apparel" },
-        { name: "Cycling", slug: "cycling", isPrimary: true, image: "/attached_assets/cyclist_1757357415581.png", description: "High-quality cycling apparel" },
-        { name: "Bikers", slug: "bikers", isPrimary: true, image: "/attached_assets/biker%20jersy%20kamio_1757357415580.jfif", description: "High-quality biker apparel" },
-        { name: "Custom Flags", slug: "custom-flags", isPrimary: false, image: "/attached_assets/KAMIO%20FLAGS_1757366547552.png", description: "High-quality custom flags" },
-        { name: "Corporate Gifts", slug: "corporate-gifts", isPrimary: false, image: "/attached_assets/GIFT%20ITEM%20KAMIO_1757366547551.png", description: "High-quality corporate gifts" },
-        { name: "Corporate Uniforms", slug: "corporate-uniforms", isPrimary: false, image: "/attached_assets/uniform%20kamio_1757366547552.png", description: "High-quality corporate uniforms" },
-        { name: "Stickers", slug: "stickers", isPrimary: false, image: "/attached_assets/STICKERS%20KAMIO_1757366547552.png", description: "High-quality stickers" },
-      ];
-
-      await db.insert(categories).values(categoryData);
-      console.log("Categories seeded successfully");
+      // Always check if admin user exists (separate from categories)
+      const existingAdmin = await db.select().from(users).where(eq(users.role, 'admin')).limit(1);
+      if (existingAdmin.length === 0) {
+        // Create default admin user
+        console.log("Creating default admin user...");
+        const hashedPassword = await bcrypt.hash("admin123", 10);
+        await db.insert(users).values({
+          email: "admin@kamio.com",
+          password: hashedPassword,
+          name: "Admin User",
+          role: "admin"
+        });
+        console.log("Default admin user created successfully");
+        console.log("Admin credentials: email: admin@kamio.com, password: admin123");
+      } else {
+        console.log("Admin user already exists");
+      }
     } catch (error) {
       console.error("Error seeding database:", error);
     }
