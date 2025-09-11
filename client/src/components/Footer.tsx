@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Brand Section */}
           <div>
             <div className="mb-4">
-              <img src={logoPath} alt="KAMIO" className="w-24 h-24 object-contain" />
+              <img src={logoPath} alt="KAMIO" className="w-16 h-16 object-contain" />
             </div>
             <p className="text-muted text-sm mb-4">
               Creating custom apparel for sports teams, corporations, and individuals since 2015. Quality guaranteed.
