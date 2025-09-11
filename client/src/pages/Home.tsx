@@ -7,6 +7,7 @@ import { Paintbrush2, Play, Truck, Shield, Users, Star, ArrowRight, Zap, Award, 
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import type { Product, Category } from "@/../../shared/schema";
+import PromoBanner from "@/components/PromoBanner";
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -62,6 +63,13 @@ function Home() {
 
   return (
     <div className="min-h-screen">
+      {/* Promotional Banner Section */}
+      <section className="py-4 md:py-6">
+        <div className="container mx-auto px-4">
+          <PromoBanner />
+        </div>
+      </section>
+
       {/* Hero Section - Compact Mobile-Optimized */}
       <section className="relative bg-white py-8 md:py-12 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
@@ -206,7 +214,7 @@ function Home() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product, index) => (
+            {featuredProducts.map((product: Product, index: number) => (
               <Link key={product.id} href={`/product/${product.id}`}>
                 <Card className="group cursor-pointer border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden product-card-animation">
                   <div className="aspect-[3/4] relative overflow-hidden">

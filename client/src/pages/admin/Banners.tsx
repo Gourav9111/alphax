@@ -21,9 +21,15 @@ import { Banner } from "@shared/schema";
 const bannerSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  image: z.string().url("Please enter a valid image URL"),
+  image: z.union([
+    z.string().url("Please enter a valid URL"),
+    z.string().regex(/^\//, "Please enter a valid path starting with /")
+  ], { message: "Please enter a valid image URL or path" }),
   buttonText: z.string().min(1, "Button text is required"),
-  redirectUrl: z.string().url("Please enter a valid redirect URL"),
+  redirectUrl: z.union([
+    z.string().url("Please enter a valid URL"),
+    z.string().regex(/^\//, "Please enter a valid path starting with /")
+  ], { message: "Please enter a valid redirect URL or path" }),
   priority: z.number().min(0, "Priority must be 0 or greater").max(100, "Priority must be 100 or less"),
   isActive: z.boolean(),
 });
