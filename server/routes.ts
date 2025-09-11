@@ -576,6 +576,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // with hardcoded credentials. Use the secured /api/create-admin endpoint instead
   // (requires existing admin authentication)
 
+  // Address routes
+  app.get("/api/addresses", authenticateToken, async (req, res) => {
+    try {
+      const addresses = await storage.getAddresses(req.user.userId);
+      res.json(addresses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch addresses", error: error.message });
+    }
+  });
+
+  app.post("/api/addresses", authenticateToken, async (req, res) => {
+    try {
+      const validatedData = insertAddressSchema.parse({
+        ...req.body,
+        userId: req.user.userId
+      });
+      const address = await storage.createAddress(validatedData);
+      res.status(201).json(address);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create address", error: error.message });
+    }
+  });
+
+  app.put("/api/addresses/:id", authenticateToken, async (req, res) => {
+    try {
+      const validatedData = insertAddressSchema.partial().parse(req.body);
+      const address = await storage.updateAddress(req.params.id, validatedData);
+      if (!address) {
+        return res.status(404).json({ message: "Address not found" });
+      }
+      res.json(address);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update address", error: error.message });
+    }
+  });
+
+  app.delete("/api/addresses/:id", authenticateToken, async (req, res) => {
+    try {
+      const success = await storage.deleteAddress(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Address not found" });
+      }
+      res.json({ message: "Address deleted successfully" });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to delete address", error: error.message });
+    }
+  });
+
+  app.post("/api/addresses/:id/set-default", authenticateToken, async (req, res) => {
+    try {
+      const success = await storage.setDefaultAddress(req.user.userId, req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Address not found" });
+      }
+      res.json({ message: "Default address updated successfully" });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to set default address", error: error.message });
+    }
+  });
+
+  // Admin route to get all users with their addresses
+  app.get("/api/admin/users", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const allUsers = await storage.getAllUsers();
+      const usersWithAddresses = await Promise.all(
+        allUsers.map(async (user) => {
+          const addresses = await storage.getAddresses(user.id);
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            createdAt: user.createdAt,
+            addresses: addresses
+          };
+        })
+      );
+      res.json(usersWithAddresses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users with addresses", error: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
