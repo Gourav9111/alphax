@@ -22,7 +22,20 @@ declare global {
   }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || "kamio-secret-key";
+// Ensure JWT_SECRET is available
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required for security in production');
+  } else {
+    // In development, generate a temporary secret with warnings
+    console.warn('⚠️  WARNING: JWT_SECRET not set! Using temporary secret for development.');
+    console.warn('⚠️  Set JWT_SECRET environment variable for production security!');
+    console.warn('⚠️  Example: export JWT_SECRET="your-very-secure-secret-key-here"');
+    process.env.JWT_SECRET = 'dev-temporary-secret-' + Math.random().toString(36);
+  }
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -91,7 +104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const user = await storage.createUser(userData);
-      const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET);
+      const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
 
       res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role }, token });
     } catch (error) {
@@ -113,7 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET);
+      const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
       res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role }, token });
     } catch (error) {
       res.status(500).json({ message: "Login failed", error });
@@ -134,20 +147,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded images
+  // Serve uploaded images - secured against path traversal
   app.get("/api/images/:filename", (req: Request, res: Response) => {
     const filename = req.params.filename;
     const decodedFilename = decodeURIComponent(filename);
+    
+    // Prevent directory traversal attacks
+    if (decodedFilename.includes('..') || decodedFilename.includes('/') || decodedFilename.includes('\\')) {
+      return res.status(400).json({ message: 'Invalid filename' });
+    }
+    
     const imagePath = path.join(__dirname, "..", "uploaded_images", decodedFilename);
-    res.sendFile(imagePath);
+    
+    // Ensure the resolved path is within the upload directory
+    const uploadDirPath = path.resolve(__dirname, "..", "uploaded_images");
+    const resolvedImagePath = path.resolve(imagePath);
+    
+    if (!resolvedImagePath.startsWith(uploadDirPath)) {
+      return res.status(400).json({ message: 'Invalid file path' });
+    }
+    
+    res.sendFile(resolvedImagePath);
   });
 
-  // Serve attached assets
+  // Serve attached assets - secured against path traversal
   app.get("/attached_assets/:filename", (req: Request, res: Response) => {
     const filename = req.params.filename;
     const decodedFilename = decodeURIComponent(filename);
+    
+    // Prevent directory traversal attacks
+    if (decodedFilename.includes('..') || decodedFilename.includes('/') || decodedFilename.includes('\\')) {
+      return res.status(400).json({ message: 'Invalid filename' });
+    }
+    
     const imagePath = path.join(__dirname, "..", "attached_assets", decodedFilename);
-    res.sendFile(imagePath);
+    
+    // Ensure the resolved path is within the assets directory
+    const assetsDirPath = path.resolve(__dirname, "..", "attached_assets");
+    const resolvedImagePath = path.resolve(imagePath);
+    
+    if (!resolvedImagePath.startsWith(assetsDirPath)) {
+      return res.status(400).json({ message: 'Invalid file path' });
+    }
+    
+    res.sendFile(resolvedImagePath);
   });
 
   // Category routes
@@ -467,9 +510,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Debug endpoint to check users
-  app.get("/api/debug/users", async (req, res) => {
+  // Debug endpoint to check users - SECURED
+  app.get("/api/debug/users", authenticateToken, requireAdmin, async (req, res) => {
     try {
+      // Only allow in development environment
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(404).json({ message: 'Endpoint not available in production' });
+      }
+      
       const allUsers = await storage.getAllUsers();
       const usersWithoutPasswords = allUsers.map(user => ({
         id: user.id,
@@ -483,10 +531,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create initial admin user (remove this endpoint after creating admin)
-  app.post("/api/create-admin", async (req, res) => {
+  // Create admin user - SECURED (admin-only endpoint)
+  app.post("/api/create-admin", authenticateToken, requireAdmin, async (req, res) => {
     try {
+      // Only allow in development environment
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(404).json({ message: 'Endpoint not available in production' });
+      }
+      
       const { email, password, name } = req.body;
+
+      if (!email || !password || !name) {
+        return res.status(400).json({ message: 'Email, password, and name are required' });
+      }
 
       console.log("Creating admin user:", { email, name });
 
@@ -499,7 +556,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const userData = { email, password, name, role: 'admin' as const };
       const user = await storage.createUser(userData);
-      const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET);
+      const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
 
       console.log("Admin user created successfully:", { id: user.id, email: user.email, role: user.role });
 
@@ -514,39 +571,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Force create a new admin (use this to get guaranteed working credentials)
-  app.post("/api/force-admin", async (req, res) => {
-    try {
-      const email = "admin@kamio.com";
-      const password = "admin123456";
-      const name = "Kamio Admin";
-
-      // Delete existing user if exists
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        await storage.deleteUser(existingUser.id);
-      }
-
-      const userData = { email, password, name, role: 'admin' as const };
-      const user = await storage.createUser(userData);
-      const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET);
-
-      console.log("Force admin user created:", { id: user.id, email: user.email, role: user.role });
-
-      res.json({ 
-        user: { id: user.id, email: user.email, name: user.name, role: user.role }, 
-        token,
-        credentials: {
-          email: email,
-          password: password
-        },
-        message: "Admin user force created successfully" 
-      });
-    } catch (error) {
-      console.error("Error force creating admin user:", error);
-      res.status(400).json({ message: "Failed to force create admin user", error: error.message });
-    }
-  });
+  // REMOVED: Force admin endpoint - CRITICAL SECURITY VULNERABILITY FIXED
+  // This endpoint was extremely dangerous as it allowed anyone to create admin accounts
+  // with hardcoded credentials. Use the secured /api/create-admin endpoint instead
+  // (requires existing admin authentication)
 
   const httpServer = createServer(app);
   return httpServer;

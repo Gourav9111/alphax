@@ -6,6 +6,33 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
+// Safe logging function that excludes sensitive data
+function createSafeLogData(data: any): any {
+  if (!data || typeof data !== 'object') return data;
+  
+  const sensitiveFields = ['token', 'password', 'credentials', 'authorization'];
+  
+  if (Array.isArray(data)) {
+    return data.map(item => createSafeLogData(item));
+  }
+  
+  const safeData: any = {};
+  for (const [key, value] of Object.entries(data)) {
+    const keyLower = key.toLowerCase();
+    
+    // Skip sensitive fields entirely
+    if (sensitiveFields.some(field => keyLower.includes(field))) {
+      safeData[key] = '[REDACTED]';
+    } else if (typeof value === 'object' && value !== null) {
+      safeData[key] = createSafeLogData(value);
+    } else {
+      safeData[key] = value;
+    }
+  }
+  
+  return safeData;
+}
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -22,7 +49,9 @@ app.use((req, res, next) => {
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+        // Use safe logging to prevent exposing sensitive data
+        const safeResponse = createSafeLogData(capturedJsonResponse);
+        logLine += ` :: ${JSON.stringify(safeResponse)}`;
       }
 
       if (logLine.length > 80) {
