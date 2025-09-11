@@ -121,10 +121,14 @@ export default function Profile() {
 
   const createAddressMutation = useMutation({
     mutationFn: async (addressData: AddressForm) => {
+      const authRequest = createAuthenticatedRequest("/api/addresses");
       const response = await fetch("/api/addresses", {
-        ...createAuthenticatedRequest("/api/addresses"),
+        ...authRequest,
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          ...authRequest.headers,
+          "Content-Type": "application/json" 
+        },
         body: JSON.stringify(addressData),
       });
       if (!response.ok) throw new Error("Failed to create address");
@@ -138,10 +142,14 @@ export default function Profile() {
 
   const updateAddressMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: AddressForm }) => {
+      const authRequest = createAuthenticatedRequest(`/api/addresses/${id}`);
       const response = await fetch(`/api/addresses/${id}`, {
-        ...createAuthenticatedRequest(`/api/addresses/${id}`),
+        ...authRequest,
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          ...authRequest.headers,
+          "Content-Type": "application/json" 
+        },
         body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed to update address");
@@ -155,8 +163,9 @@ export default function Profile() {
 
   const deleteAddressMutation = useMutation({
     mutationFn: async (id: string) => {
+      const authRequest = createAuthenticatedRequest(`/api/addresses/${id}`);
       const response = await fetch(`/api/addresses/${id}`, {
-        ...createAuthenticatedRequest(`/api/addresses/${id}`),
+        ...authRequest,
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Failed to delete address");
@@ -170,8 +179,9 @@ export default function Profile() {
 
   const setDefaultAddressMutation = useMutation({
     mutationFn: async (id: string) => {
+      const authRequest = createAuthenticatedRequest(`/api/addresses/${id}/set-default`);
       const response = await fetch(`/api/addresses/${id}/set-default`, {
-        ...createAuthenticatedRequest(`/api/addresses/${id}/set-default`),
+        ...authRequest,
         method: "POST",
       });
       if (!response.ok) throw new Error("Failed to set default address");
