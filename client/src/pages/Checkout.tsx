@@ -34,6 +34,7 @@ interface CartItemWithProduct {
   quantity: number;
   size?: string;
   color?: string;
+  customDesign?: any;
   product?: {
     id: string;
     name: string;
