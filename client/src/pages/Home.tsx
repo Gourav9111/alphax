@@ -215,15 +215,17 @@ function Home() {
             {customCategories.map((category, index) => (
               <Link key={category.id} href={`/category/${category.slug}`}>
                 <Card className="group cursor-pointer border-none shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full">
-                  <div className="aspect-[9/16] relative overflow-hidden">
+                  <div className="aspect-[4/5] relative overflow-hidden">
                     <img 
-                      src={category.image || `/api/placeholder/300/500`} 
+                      src={category.image || `/api/placeholder/300/400`} 
                       alt={category.name}
-                      className="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      data-testid={`img-category-${category.slug}`}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-primary/60 transition-all duration-300"></div>
-                    <div className="absolute bottom-3 left-3 text-white">
-                      <h3 className="font-bold text-sm md:text-lg">{category.name}</h3>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-primary/70 transition-all duration-300"></div>
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <h3 className="font-bold text-base md:text-xl mb-1">{category.name}</h3>
+                      <p className="text-xs md:text-sm text-white/90">Professional Jerseys</p>
                     </div>
                   </div>
                 </Card>
