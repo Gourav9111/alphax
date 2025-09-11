@@ -1,4 +1,4 @@
-import * as React from "react"
+import React from "react"
 
 import type {
   ToastActionElement,
@@ -179,7 +179,7 @@ function useToast() {
         listeners.splice(index, 1)
       }
     }
-  }, [state])
+  }, [])
 
   return {
     ...state,
