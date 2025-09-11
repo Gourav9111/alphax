@@ -7,7 +7,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import multer from "multer";
 import { storage } from "./storage.js";
-import { insertUserSchema, insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema } from "@shared/schema";
+import { insertUserSchema, insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema, insertBannerSchema } from "@shared/schema";
 
 // Extend Express Request type to include user
 declare global {
@@ -380,6 +380,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(order);
     } catch (error) {
       res.status(400).json({ message: "Failed to update order status", error });
+    }
+  });
+
+  // Banner routes
+  // Public route to get active banners for homepage
+  app.get("/api/banners", async (req, res) => {
+    try {
+      const banners = await storage.getActiveBanners();
+      res.json(banners);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch banners", error });
+    }
+  });
+
+  // Admin banner routes
+  app.get("/api/admin/banners", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const banners = await storage.getBanners();
+      res.json(banners);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch banners", error });
+    }
+  });
+
+  app.get("/api/admin/banners/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const banner = await storage.getBanner(req.params.id);
+      if (!banner) {
+        return res.status(404).json({ message: "Banner not found" });
+      }
+      res.json(banner);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch banner", error });
+    }
+  });
+
+  app.post("/api/admin/banners", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertBannerSchema.parse(req.body);
+      const banner = await storage.createBanner(validatedData);
+      res.status(201).json(banner);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create banner", error });
+    }
+  });
+
+  app.put("/api/admin/banners/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertBannerSchema.partial().parse(req.body);
+      const banner = await storage.updateBanner(req.params.id, validatedData);
+      if (!banner) {
+        return res.status(404).json({ message: "Banner not found" });
+      }
+      res.json(banner);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update banner", error });
+    }
+  });
+
+  app.delete("/api/admin/banners/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const success = await storage.deleteBanner(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Banner not found" });
+      }
+      res.json({ message: "Banner deleted successfully" });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to delete banner", error });
     }
   });
 
