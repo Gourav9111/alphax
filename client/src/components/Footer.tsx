@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import logoPath from "@assets/kamio-logo-green.png";
+import logoPath from "@assets/logo_transparent_1757364061106.png";
 
 export default function Footer() {
   return (
@@ -8,8 +8,14 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
           <div>
-            <div className="mb-4">
-              <img src={logoPath} alt="KAMIO" className="h-12 w-auto object-contain mb-4" />
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                <img src={logoPath} alt="KAMIO" className="w-8 h-8 object-contain" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-primary">KAMIO</h3>
+                <p className="text-xs text-muted">Custom Lifestyle</p>
+              </div>
             </div>
             <p className="text-muted text-sm mb-4">
               Creating custom apparel for sports teams, corporations, and individuals since 2015. Quality guaranteed.
