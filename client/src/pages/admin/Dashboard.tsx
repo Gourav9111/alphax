@@ -261,6 +261,11 @@ export default function AdminDashboard() {
                     Manage Banners
                   </Button>
                 </Link>
+                <Link href="/admin/users">
+                  <Button variant="outline" size="lg" data-testid="link-manage-users">
+                    Manage Users
+                  </Button>
+                </Link>
               </div>
             </CardHeader>
             <CardContent>
