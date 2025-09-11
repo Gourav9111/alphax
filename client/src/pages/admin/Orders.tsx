@@ -20,6 +20,16 @@ interface Order {
     price: string;
     size?: string;
     color?: string;
+    customDesign?: {
+      scale: number;
+      rotation: number;
+      x: number;
+      y: number;
+      image?: string;
+      color: string;
+      size: string;
+      price: number;
+    };
   }>;
   shippingAddress: {
     firstName: string;
@@ -254,37 +264,64 @@ export default function AdminOrders() {
                       {/* Order Items */}
                       <div>
                         <h4 className="font-semibold mb-3">Order Items</h4>
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {order.items.map((item, index) => (
                             <div
                               key={index}
-                              className="flex justify-between items-center p-3 bg-muted/30 rounded-lg"
+                              className="p-4 bg-muted/30 rounded-lg border"
                               data-testid={`order-item-${order.id}-${index}`}
                             >
-                              <div>
-                                <p className="font-medium" data-testid={`text-item-name-${order.id}-${index}`}>
-                                  {item.name}
-                                </p>
-                                <div className="flex space-x-2 mt-1">
-                                  {item.size && (
-                                    <Badge variant="secondary">
-                                      Size: {item.size}
-                                    </Badge>
+                              <div className="flex justify-between items-start">
+                                <div className="flex space-x-3">
+                                  {/* Custom Design Image */}
+                                  {item.customDesign?.image && (
+                                    <div className="flex-shrink-0">
+                                      <img
+                                        src={item.customDesign.image}
+                                        alt="Custom Design"
+                                        className="w-16 h-16 object-cover rounded-md border"
+                                        data-testid={`img-custom-design-${order.id}-${index}`}
+                                      />
+                                    </div>
                                   )}
-                                  {item.color && (
-                                    <Badge variant="secondary">
-                                      Color: {item.color}
-                                    </Badge>
-                                  )}
+                                  <div>
+                                    <p className="font-medium" data-testid={`text-item-name-${order.id}-${index}`}>
+                                      {item.name}
+                                    </p>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                      {item.size && (
+                                        <Badge variant="secondary">
+                                          Size: {item.size}
+                                        </Badge>
+                                      )}
+                                      {item.color && (
+                                        <Badge variant="secondary">
+                                          Color: {item.color}
+                                        </Badge>
+                                      )}
+                                      {item.customDesign && (
+                                        <Badge variant="outline" className="border-orange-500 text-orange-700">
+                                          Custom Design
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    {/* Custom Design Details */}
+                                    {item.customDesign && (
+                                      <div className="mt-2 text-xs text-muted-foreground space-y-1">
+                                        <p>Scale: {item.customDesign.scale}% | Rotation: {item.customDesign.rotation}°</p>
+                                        <p>Position: X:{item.customDesign.x}, Y:{item.customDesign.y}</p>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-medium" data-testid={`text-item-total-${order.id}-${index}`}>
-                                  ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  {item.quantity}x ₹{parseFloat(item.price).toFixed(2)}
-                                </p>
+                                <div className="text-right">
+                                  <p className="font-medium" data-testid={`text-item-total-${order.id}-${index}`}>
+                                    ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {item.quantity}x ₹{parseFloat(item.price).toFixed(2)}
+                                  </p>
+                                </div>
                               </div>
                             </div>
                           ))}
