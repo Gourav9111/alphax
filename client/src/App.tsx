@@ -55,3 +55,56 @@ function App() {
 }
 
 export default App;
+import { Route, Switch } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import Layout from "@/components/Layout";
+import Home from "@/pages/Home";
+import Categories from "@/pages/Categories";
+import Product from "@/pages/Product";
+import Cart from "@/pages/Cart";
+import Checkout from "@/pages/Checkout";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import Profile from "@/pages/Profile";
+import Customize from "@/pages/Customize";
+import AdminLogin from "@/pages/admin/Login";
+import AdminDashboard from "@/pages/admin/Dashboard";
+import AdminOrders from "@/pages/admin/Orders";
+import AdminProducts from "@/pages/admin/Products";
+import AdminBanners from "@/pages/admin/Banners";
+import NotFound from "@/pages/not-found";
+
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Layout>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/categories" component={Categories} />
+          <Route path="/category/:slug">
+            {(params) => <Categories categorySlug={params.slug} />}
+          </Route>
+          <Route path="/product/:id" component={Product} />
+          <Route path="/cart" component={Cart} />
+          <Route path="/checkout" component={Checkout} />
+          <Route path="/login" component={Login} />
+          <Route path="/signup" component={Signup} />
+          <Route path="/profile" component={Profile} />
+          <Route path="/customize" component={Customize} />
+          <Route path="/admin/login" component={AdminLogin} />
+          <Route path="/admin/dashboard" component={AdminDashboard} />
+          <Route path="/admin/orders" component={AdminOrders} />
+          <Route path="/admin/products" component={AdminProducts} />
+          <Route path="/admin/banners" component={AdminBanners} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
+      <Toaster />
+    </QueryClientProvider>
+  );
+}
+
+export default App;

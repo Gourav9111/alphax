@@ -65,7 +65,7 @@ export default function AdminDashboard() {
               Access Denied
             </h1>
             <p className="text-muted-foreground mb-6">
-              {!authenticated 
+              {!authenticated
                 ? "Please log in to access the admin dashboard."
                 : "You don't have permission to access the admin dashboard. Please contact an administrator."
               }
@@ -292,6 +292,24 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Banners Section */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Promotional Banners</CardTitle>
+              <Link href="/admin/banners">
+                <Button variant="default" size="lg" className="bg-[#E30613] hover:bg-[#E30613]/90 text-white" data-testid="link-manage-banners">
+                  Manage Banners
+                </Button>
+              </Link>
+            </CardHeader>
+            <CardContent>
+              {/* This section would display a summary of active banners or a prompt to create one */}
+              <p className="text-muted-foreground text-center py-4">
+                Manage your promotional banners from the admin panel.
+              </p>
             </CardContent>
           </Card>
         </div>

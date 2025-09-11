@@ -170,6 +170,30 @@ SELECT
 FROM categories WHERE slug = 'esports'
 LIMIT 1;
 
+-- Insert sample custom designs (optional)
+INSERT INTO custom_designs (id, user_id, name, design, price) VALUES
+('design1', 'user1', 'Team Logo Design', '{"logo": "team_logo.png", "colors": ["red", "white"], "text": "Team Name"}', 299.00),
+('design2', 'user2', 'Personal Jersey', '{"text": "Player Name", "number": "10", "colors": ["blue", "yellow"]}', 199.00);
+
+-- Create banners table for promotional banners
+CREATE TABLE IF NOT EXISTS banners (
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    image TEXT NOT NULL,
+    button_text TEXT NOT NULL DEFAULT 'Customize Your T-Shirt Now',
+    button_link TEXT NOT NULL DEFAULT '/customize',
+    discount_text TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    start_date TIMESTAMP NULL,
+    end_date TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert sample promotional banner
+INSERT INTO banners (id, title, description, image, button_text, button_link, discount_text, is_active) VALUES
+('banner1', 'Navratri Special Sale', 'Celebrate Navratri with custom group t-shirts featuring your logo and names. Perfect for teams, festivals, and group events!', '/attached_assets/imgi_6_default_1757362105659.jpg', 'Customize Your T-Shirt Now', '/customize', '50% OFF', TRUE);
+
 -- Create indexes for performance
 CREATE INDEX idx_users_email_lookup ON users (email(191));
 CREATE INDEX idx_categories_slug_lookup ON categories (slug(191));

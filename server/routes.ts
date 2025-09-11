@@ -415,6 +415,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Banner routes
+  app.get("/api/banners/active", async (req, res) => {
+    try {
+      const activeBanner = await storage.getActiveBanner();
+      res.json(activeBanner);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch active banner", error });
+    }
+  });
+
+  app.get("/api/admin/banners", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const banners = await storage.getBanners();
+      res.json(banners);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch banners", error });
+    }
+  });
+
+  app.post("/api/admin/banners", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const bannerData = req.body;
+      const banner = await storage.createBanner(bannerData);
+      res.json(banner);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid banner data", error });
+    }
+  });
+
+  app.put("/api/admin/banners/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const banner = await storage.updateBanner(req.params.id, req.body);
+      if (!banner) {
+        return res.status(404).json({ message: "Banner not found" });
+      }
+      res.json(banner);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update banner", error });
+    }
+  });
+
+  app.delete("/api/admin/banners/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const deleted = await storage.deleteBanner(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Banner not found" });
+      }
+      res.json({ message: "Banner deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete banner", error });
+    }
+  });
+
   // Create initial admin user (remove this endpoint after creating admin)
   app.post("/api/create-admin", async (req, res) => {
     try {

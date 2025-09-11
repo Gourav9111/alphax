@@ -7,6 +7,7 @@ import { Paintbrush2, Play, Truck, Shield, Users, Star, ArrowRight, Zap, Award, 
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import type { Product, Category } from "@/../../shared/schema";
+import PromoBanner from "@/components/PromoBanner";
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -62,6 +63,9 @@ function Home() {
 
   return (
     <div className="min-h-screen">
+      {/* Promotional Banner */}
+      <PromoBanner />
+      
       {/* Hero Section - Compact Mobile-Optimized */}
       <section className="relative bg-white py-8 md:py-12 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
