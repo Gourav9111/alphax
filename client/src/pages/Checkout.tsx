@@ -9,20 +9,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { isAuthenticated, createAuthenticatedRequest } from "@/lib/auth";
-import { CreditCard, Lock } from "lucide-react";
+import { CreditCard, Lock, MapPin, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { indianStates, getCitiesForState, getPincodesForCity } from "@shared/indianAddressData";
 
 const checkoutSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
+  phone: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit Indian mobile number"),
   address: z.string().min(10, "Please enter your full address"),
   city: z.string().min(2, "Please enter your city"),
   state: z.string().min(2, "Please enter your state"),
-  pincode: z.string().min(6, "Please enter a valid pincode"),
+  pincode: z.string().regex(/^[1-9]\d{5}$/, "Please enter a valid 6-digit pincode"),
   country: z.string().default("India"),
 });
 
@@ -40,6 +42,7 @@ interface CartItemWithProduct {
     name: string;
     price: string;
     images?: string[];
+    sizes?: string[];
   };
 }
 
@@ -49,9 +52,17 @@ export default function Checkout() {
   const queryClient = useQueryClient();
   const authenticated = isAuthenticated();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [useNewAddress, setUseNewAddress] = useState(true);
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
 
   const { data: cartItems = [], isLoading } = useQuery<CartItemWithProduct[]>({
     queryKey: ["/api/cart"],
+    enabled: authenticated,
+  });
+
+  const { data: savedAddresses = [] } = useQuery({
+    queryKey: ["/api/addresses"],
     enabled: authenticated,
   });
 
@@ -70,8 +81,54 @@ export default function Checkout() {
     },
   });
 
+  // Handle state change to populate cities
+  const handleStateChange = (state: string) => {
+    setSelectedState(state);
+    setSelectedCity(""); // Reset city when state changes
+    form.setValue("state", state);
+    form.setValue("city", ""); // Clear city
+    form.setValue("pincode", ""); // Clear pincode
+  };
+
+  // Handle city change to populate pincodes
+  const handleCityChange = (city: string) => {
+    setSelectedCity(city);
+    form.setValue("city", city);
+    form.setValue("pincode", ""); // Clear pincode
+    
+    // Auto-suggest first pincode
+    const pincodes = getPincodesForCity(city);
+    if (pincodes.length > 0) {
+      form.setValue("pincode", pincodes[0]);
+    }
+  };
+
+  // Load saved address
+  const loadSavedAddress = (address: any) => {
+    form.setValue("firstName", address.fullName.split(' ')[0] || '');
+    form.setValue("lastName", address.fullName.split(' ').slice(1).join(' ') || '');
+    form.setValue("phone", address.phone);
+    form.setValue("address", address.addressLine1);
+    form.setValue("city", address.city);
+    form.setValue("state", address.state);
+    form.setValue("pincode", address.pincode);
+    form.setValue("country", "India"); // Ensure country is set
+    setSelectedState(address.state);
+    setSelectedCity(address.city);
+    setUseNewAddress(false);
+  };
+
   const createOrderMutation = useMutation({
     mutationFn: async (orderData: CheckoutForm) => {
+      // Validate that all items requiring sizes have sizes selected
+      const itemsWithMissingSize = cartItems.filter(item => 
+        item.product?.sizes && item.product.sizes.length > 0 && !item.size
+      );
+      
+      if (itemsWithMissingSize.length > 0) {
+        throw new Error(`Please select size for: ${itemsWithMissingSize.map(item => item.product?.name).join(', ')}`);
+      }
+
       const items = cartItems.map(item => ({
         productId: item.productId,
         quantity: item.quantity,
@@ -267,6 +324,44 @@ export default function Checkout() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Saved Address Selection */}
+                {savedAddresses.length > 0 && (
+                  <div className="mb-6 p-4 border rounded-lg bg-muted/30">
+                    <h3 className="font-medium mb-3 flex items-center">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      Choose Saved Address
+                    </h3>
+                    <div className="space-y-2 mb-4">
+                      {savedAddresses.map((address: any) => (
+                        <div
+                          key={address.id}
+                          className="p-3 border rounded cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => loadSavedAddress(address)}
+                          data-testid={`saved-address-${address.id}`}
+                        >
+                          <div className="font-medium">{address.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {address.fullName} • {address.phone}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {address.addressLine1}, {address.city}, {address.state} {address.pincode}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setUseNewAddress(true)}
+                      className="flex items-center"
+                      data-testid="button-new-address"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add New Address
+                    </Button>
+                  </div>
+                )}
+
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -366,16 +461,28 @@ export default function Checkout() {
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
-                        name="city"
+                        name="state"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>City</FormLabel>
+                            <FormLabel>State</FormLabel>
                             <FormControl>
-                              <Input
-                                {...field}
+                              <Select 
+                                value={field.value} 
+                                onValueChange={handleStateChange}
                                 disabled={isProcessing}
-                                data-testid="input-city"
-                              />
+                                data-testid="select-state"
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select state" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {indianStates.map((state) => (
+                                    <SelectItem key={state} value={state}>
+                                      {state}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -383,16 +490,28 @@ export default function Checkout() {
                       />
                       <FormField
                         control={form.control}
-                        name="state"
+                        name="city"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>State</FormLabel>
+                            <FormLabel>City</FormLabel>
                             <FormControl>
-                              <Input
-                                {...field}
-                                disabled={isProcessing}
-                                data-testid="input-state"
-                              />
+                              <Select 
+                                value={field.value} 
+                                onValueChange={handleCityChange}
+                                disabled={isProcessing || !selectedState}
+                                data-testid="select-city"
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder={!selectedState ? "Select state first" : "Select city"} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {getCitiesForState(selectedState).map((city) => (
+                                    <SelectItem key={city} value={city}>
+                                      {city}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -408,11 +527,32 @@ export default function Checkout() {
                           <FormItem>
                             <FormLabel>Pincode</FormLabel>
                             <FormControl>
-                              <Input
-                                {...field}
-                                disabled={isProcessing}
-                                data-testid="input-pincode"
-                              />
+                              {getPincodesForCity(selectedCity).length > 0 ? (
+                                <Select 
+                                  value={field.value} 
+                                  onValueChange={(value) => field.onChange(value)}
+                                  disabled={isProcessing || !selectedCity}
+                                  data-testid="select-pincode"
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select pincode" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {getPincodesForCity(selectedCity).map((pincode) => (
+                                      <SelectItem key={pincode} value={pincode}>
+                                        {pincode}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Input
+                                  {...field}
+                                  disabled={isProcessing}
+                                  placeholder="Enter pincode"
+                                  data-testid="input-pincode"
+                                />
+                              )}
                             </FormControl>
                             <FormMessage />
                           </FormItem>
