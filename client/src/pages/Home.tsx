@@ -71,7 +71,27 @@ function Home() {
       </section>
 
       {/* Hero Section - Compact Mobile-Optimized */}
-      <section className="relative bg-white py-8 md:py-12 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 md:py-12 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Floating Geometric Shapes */}
+          <div className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full animate-float-slow"></div>
+          <div className="absolute top-40 right-20 w-16 h-16 bg-yellow-400/20 rounded-full animate-float-medium"></div>
+          <div className="absolute bottom-32 left-20 w-24 h-24 bg-green-400/15 rounded-full animate-float-fast"></div>
+          <div className="absolute top-60 right-40 w-12 h-12 bg-blue-400/20 rounded-full animate-float-slow"></div>
+          
+          {/* Animated Lines */}
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-1/4 left-0 w-32 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-slide-right"></div>
+            <div className="absolute top-2/3 right-0 w-40 h-px bg-gradient-to-l from-transparent via-yellow-400/30 to-transparent animate-slide-left"></div>
+          </div>
+          
+          {/* Pulsing Dots */}
+          <div className="absolute top-1/3 left-1/4 w-2 h-2 bg-primary rounded-full animate-pulse-dot"></div>
+          <div className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-yellow-400 rounded-full animate-pulse-dot" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-2/3 left-1/3 w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse-dot" style={{animationDelay: '2s'}}></div>
+        </div>
+        
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-6 md:gap-8 items-center">
             {/* Left Content */}
