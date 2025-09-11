@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { isAuthenticated, getCurrentUser, logout, isAdmin } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
@@ -125,10 +125,11 @@ export default function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-64">
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-8">
-                  <h2 className="font-bold text-lg">Menu</h2>
-                </div>
+              <SheetHeader className="p-4">
+                <SheetTitle>Navigation Menu</SheetTitle>
+                <SheetDescription>Access all sections of KAMIO</SheetDescription>
+              </SheetHeader>
+              <div className="px-4 pb-4">
                 <nav className="space-y-4">
                   <Link
                     href="/"
