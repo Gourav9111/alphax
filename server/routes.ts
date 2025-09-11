@@ -7,7 +7,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import multer from "multer";
 import { storage } from "./storage.js";
-import { insertUserSchema, insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema, insertBannerSchema } from "@shared/schema";
+import { insertUserSchema, insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema, insertBannerSchema, insertAddressSchema } from "@shared/schema";
 
 // Extend Express Request type to include user
 declare global {
