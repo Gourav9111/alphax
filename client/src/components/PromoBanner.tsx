@@ -1,106 +1,78 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { Link } from "wouter";
 
 interface Banner {
-  id: string;
+  id: number;
   title: string;
   description: string;
-  image: string;
-  buttonText: string;
-  buttonLink: string;
-  discountText?: string;
-  isActive: boolean;
-  startDate?: string;
-  endDate?: string;
+  image_url: string;
+  button_text: string;
+  button_link: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export default function PromoBanner() {
   const [banner, setBanner] = useState<Banner | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    const fetchActiveBanner = async () => {
+    // Fetch active banner from API
+    const fetchBanner = async () => {
       try {
         const response = await fetch("/api/banners/active");
         if (response.ok) {
-          const activeBanner = await response.json();
-          if (activeBanner) {
-            setBanner(activeBanner);
-            setIsVisible(true);
-          }
+          const data = await response.json();
+          setBanner(data);
         }
       } catch (error) {
         console.error("Failed to fetch banner:", error);
       }
     };
 
-    fetchActiveBanner();
+    fetchBanner();
   }, []);
 
-  const handleClose = () => {
-    setIsVisible(false);
-  };
-
-  if (!banner || !isVisible) {
-    return null;
-  }
+  if (!banner || !isVisible) return null;
 
   return (
-    <div className="relative bg-gradient-to-r from-primary/90 to-primary text-white overflow-hidden">
-      <div className="absolute inset-0 bg-black/10"></div>
-      
-      {/* Close button */}
-      <button
-        onClick={handleClose}
-        className="absolute top-2 right-2 z-20 p-1 hover:bg-white/20 rounded-full transition-colors"
-        aria-label="Close banner"
-      >
-        <X className="h-4 w-4" />
-      </button>
-
-      <div className="relative z-10 container mx-auto px-4 py-6">
-        <div className="grid md:grid-cols-2 gap-6 items-center">
-          {/* Content */}
-          <div className="order-2 md:order-1">
-            <div className="space-y-4">
-              {banner.discountText && (
-                <div className="inline-block bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-bold">
-                  {banner.discountText}
-                </div>
-              )}
-              
-              <h2 className="text-2xl md:text-3xl font-bold leading-tight">
-                {banner.title}
-              </h2>
-              
-              <p className="text-white/90 text-sm md:text-base max-w-md">
-                {banner.description}
-              </p>
-              
-              <Link href={banner.buttonLink}>
-                <Button 
-                  size="lg" 
-                  className="bg-white text-primary hover:bg-white/90 font-semibold px-6 py-3"
-                >
-                  {banner.buttonText}
-                </Button>
-              </Link>
-            </div>
+    <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <button
+          onClick={() => setIsVisible(false)}
+          className="absolute top-4 right-4 text-white hover:text-gray-200 transition-colors"
+          aria-label="Close banner"
+        >
+          <X className="h-6 w-6" />
+        </button>
+        
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <h2 className="text-3xl font-bold mb-4">{banner.title}</h2>
+            <p className="text-lg mb-6 text-blue-100">
+              {banner.description}
+            </p>
+            <Button 
+              size="lg" 
+              variant="secondary"
+              onClick={() => window.location.href = banner.button_link}
+            >
+              {banner.button_text}
+            </Button>
           </div>
-
-          {/* Image */}
-          <div className="order-1 md:order-2">
-            <div className="relative max-w-sm mx-auto md:max-w-full">
+          
+          {banner.image_url && (
+            <div className="flex justify-center">
               <img
-                src={banner.image}
+                src={banner.image_url}
                 alt={banner.title}
-                className="w-full h-48 md:h-64 object-cover rounded-lg shadow-xl"
+                className="max-w-full h-auto rounded-lg shadow-lg"
               />
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
