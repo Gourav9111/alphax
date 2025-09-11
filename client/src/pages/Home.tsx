@@ -8,6 +8,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import type { Product, Category } from "@/../../shared/schema";
 import PromoBanner from "@/components/PromoBanner";
+import TouchFX from "@/components/TouchFX";
+import Tilt3D from "@/components/Tilt3D";
+import HeroScene3D from "@/components/HeroScene3D";
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -70,8 +73,14 @@ function Home() {
         </div>
       </section>
 
-      {/* Hero Section - Compact Mobile-Optimized */}
+      {/* Hero Section - Interactive 3D Touch Animations */}
       <section className="relative bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 md:py-12 overflow-hidden">
+        {/* 3D Scene Background - Temporarily disabled due to WebGL issues */}
+        {/* <HeroScene3D className="z-0" aria-hidden="true" role="presentation" /> */}
+        
+        {/* Touch Ripple Overlay */}
+        <TouchFX className="z-40" aria-hidden="true" role="presentation" />
+        
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Floating Geometric Shapes */}
@@ -92,10 +101,10 @@ function Home() {
           <div className="absolute top-2/3 left-1/3 w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse-dot" style={{animationDelay: '2s'}}></div>
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-30">
           <div className="grid lg:grid-cols-2 gap-6 md:gap-8 items-center">
-            {/* Left Content */}
-            <div className="order-2 lg:order-1 text-center lg:text-left">
+            {/* Left Content - Interactive 3D Tilt */}
+            <Tilt3D className="order-2 lg:order-1 text-center lg:text-left">
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-3">
                 <Badge variant="outline" className="border-primary text-primary bg-primary/10 text-xs">
                   <Award className="mr-1 h-3 w-3" />
@@ -117,16 +126,16 @@ function Home() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link href="/customize">
-                  <Button size="default" className="bg-primary hover:bg-primary/90 text-white px-6 py-3 text-sm md:text-base w-full sm:w-auto transform hover:scale-105 transition-all duration-300">
+                  <Button size="default" className="bg-primary hover:bg-primary/90 text-white px-6 py-3 text-sm md:text-base w-full sm:w-auto transform hover:scale-105 transition-all duration-300" data-testid="button-start-customizing">
                     <Paintbrush2 className="mr-2 h-4 w-4" />
                     Start Customizing
                   </Button>
                 </Link>
               </div>
-            </div>
+            </Tilt3D>
             
-            {/* Right Content - Image Slider */}
-            <div className="order-1 lg:order-2 relative">
+            {/* Right Content - Image Slider with 3D Tilt */}
+            <Tilt3D className="order-1 lg:order-2 relative" tiltStrength={10}>
               <div className="relative max-w-sm mx-auto lg:max-w-full">
                 <div className="aspect-square relative overflow-hidden rounded-lg shadow-2xl">
                   <img 
@@ -166,7 +175,7 @@ function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </Tilt3D>
           </div>
         </div>
       </section>

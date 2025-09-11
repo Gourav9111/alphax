@@ -19,7 +19,7 @@ export default function TouchFX({ className = '' }: TouchFXProps) {
   // Check if user prefers reduced motion
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const createRipple = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+  const createRipple = useCallback((event: PointerEvent) => {
     if (prefersReducedMotion || !containerRef.current) return;
 
     const rect = containerRef.current.getBoundingClientRect();
@@ -58,12 +58,20 @@ export default function TouchFX({ className = '' }: TouchFXProps) {
     return <div ref={containerRef} className={`absolute inset-0 ${className}`} data-testid="overlay-touchfx-disabled" />;
   }
 
+  // Add document-level event listener to avoid blocking clicks
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+
+    const handlePointerDown = (event: PointerEvent) => createRipple(event);
+    document.addEventListener('pointerdown', handlePointerDown);
+    
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [createRipple, prefersReducedMotion]);
+
   return (
     <div
       ref={containerRef}
       className={`absolute inset-0 pointer-events-none ${className}`}
-      onPointerDown={createRipple}
-      style={{ pointerEvents: 'auto' }}
       data-testid="overlay-touchfx"
     >
       {ripples.map(ripple => (
