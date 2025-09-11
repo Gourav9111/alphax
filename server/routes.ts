@@ -312,6 +312,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/cart", authenticateToken, async (req, res) => {
     try {
+      console.log("Cart POST request body:", JSON.stringify(req.body, null, 2));
+      
       const cartItemData = insertCartItemSchema.parse({
         ...req.body,
         userId: req.user.userId
@@ -320,7 +322,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const cartItem = await storage.addToCart(cartItemData);
       res.json(cartItem);
     } catch (error) {
-      res.status(400).json({ message: "Invalid cart item data", error });
+      console.error("Cart validation error:", error);
+      console.error("Request body was:", JSON.stringify(req.body, null, 2));
+      res.status(400).json({ message: "Invalid cart item data", error: error.message || error });
     }
   });
 
