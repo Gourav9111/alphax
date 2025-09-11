@@ -32,34 +32,32 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Router>
-            <Layout>
-              <Switch>
-                <Route path="/" component={Home} />
-                <Route path="/login" component={Login} />
-                <Route path="/signup" component={Signup} />
-                <Route path="/categories" component={Categories} />
-                <Route path="/product/:id" component={Product} />
-                <Route path="/cart" component={Cart} />
-                <Route path="/checkout" component={Checkout} />
-                <Route path="/profile" component={Profile} />
-                <Route path="/customize" component={Customize} />
-                <Route path="/admin/login" component={AdminLogin} />
-                <Route path="/admin/dashboard" component={AdminDashboard} />
-                <Route path="/admin/products" component={AdminProducts} />
-                <Route path="/admin/orders" component={AdminOrders} />
-                <Route path="/admin/banners" component={AdminBanners} />
-                <Route component={NotFoundPage} />
-              </Switch>
-            </Layout>
-          </Router>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Router>
+          <Layout>
+            <Switch>
+              <Route path="/" component={Home} />
+              <Route path="/login" component={Login} />
+              <Route path="/signup" component={Signup} />
+              <Route path="/categories" component={Categories} />
+              <Route path="/product/:id" component={Product} />
+              <Route path="/cart" component={Cart} />
+              <Route path="/checkout" component={Checkout} />
+              <Route path="/profile" component={Profile} />
+              <Route path="/customize" component={Customize} />
+              <Route path="/admin/login" component={AdminLogin} />
+              <Route path="/admin/dashboard" component={AdminDashboard} />
+              <Route path="/admin/products" component={AdminProducts} />
+              <Route path="/admin/orders" component={AdminOrders} />
+              <Route path="/admin/banners" component={AdminBanners} />
+              <Route component={NotFoundPage} />
+            </Switch>
+          </Layout>
           <Toaster />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </StrictMode>
+        </Router>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 
