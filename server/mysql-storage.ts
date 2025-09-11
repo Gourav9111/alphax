@@ -1,8 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import { eq, desc, and, isNull, or, lte, gte } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import crypto from 'crypto';
 import { 
   users, 
   categories, 
@@ -10,7 +9,6 @@ import {
   cartItems, 
   orders, 
   customDesigns, 
-  banners,
   type User, 
   type InsertUser, 
   type Category, 
@@ -22,9 +20,7 @@ import {
   type Order, 
   type InsertOrder, 
   type CustomDesign, 
-  type InsertCustomDesign,
-  type Banner,
-  type InsertBanner
+  type InsertCustomDesign 
 } from "../shared/mysql-schema";
 
 export interface IStorage {
@@ -65,13 +61,6 @@ export interface IStorage {
   getCustomDesigns(userId: string): Promise<CustomDesign[]>;
   getCustomDesign(id: string): Promise<CustomDesign | undefined>;
   createCustomDesign(design: InsertCustomDesign): Promise<CustomDesign>;
-
-  // Banners
-  getBanners(): Promise<Banner[]>;
-  getActiveBanner(): Promise<Banner | null>;
-  createBanner(data: InsertBanner): Promise<Banner>;
-  updateBanner(id: string, data: Partial<Banner>): Promise<Banner | null>;
-  deleteBanner(id: string): Promise<boolean>;
 }
 
 // MySQL connection configuration
@@ -90,7 +79,7 @@ const pool = mysql.createPool(connectionConfig);
 const db = drizzle(pool);
 
 export class MySQLDatabaseStorage implements IStorage {
-
+  
   constructor() {
     this.initDatabase();
   }
@@ -101,7 +90,7 @@ export class MySQLDatabaseStorage implements IStorage {
       const connection = await pool.getConnection();
       console.log("Connected to MySQL database");
       connection.release();
-
+      
       // Seed initial data
       await this.seedData();
     } catch (error) {
@@ -188,11 +177,11 @@ export class MySQLDatabaseStorage implements IStorage {
   // Products
   async getProducts(categoryId?: string): Promise<Product[]> {
     let query = db.select().from(products).where(eq(products.isActive, true));
-
+    
     if (categoryId) {
       query = query.where(eq(products.categoryId, categoryId));
     }
-
+    
     return await query.orderBy(desc(products.createdAt));
   }
 
@@ -250,11 +239,11 @@ export class MySQLDatabaseStorage implements IStorage {
   // Orders
   async getOrders(userId?: string): Promise<Order[]> {
     let query = db.select().from(orders);
-
+    
     if (userId) {
       query = query.where(eq(orders.userId, userId));
     }
-
+    
     return await query.orderBy(desc(orders.createdAt));
   }
 
@@ -286,65 +275,6 @@ export class MySQLDatabaseStorage implements IStorage {
   async createCustomDesign(design: InsertCustomDesign): Promise<CustomDesign> {
     const [result] = await db.insert(customDesigns).values(design);
     return await this.getCustomDesign(result.insertId.toString()) as CustomDesign;
-  }
-
-  // Banner methods
-  async getBanners(): Promise<Banner[]> {
-    return await db.select().from(banners).orderBy(desc(banners.createdAt));
-  }
-
-  async getActiveBanner(): Promise<Banner | null> {
-    const now = new Date();
-    const activeBanners = await this.db
-      .select()
-      .from(banners)
-      .where(
-        and(
-          eq(banners.isActive, true),
-          or(
-            isNull(banners.startDate),
-            lte(banners.startDate, now)
-          ),
-          or(
-            isNull(banners.endDate),
-            gte(banners.endDate, now)
-          )
-        )
-      )
-      .orderBy(desc(banners.createdAt))
-      .limit(1);
-
-    return activeBanners.length > 0 ? activeBanners[0] : null;
-  }
-
-  async createBanner(data: InsertBanner): Promise<Banner> {
-    const id = crypto.randomUUID();
-    const bannerToInsert: Banner = {
-      id,
-      ...data,
-      startDate: data.startDate ? new Date(data.startDate) : null,
-      endDate: data.endDate ? new Date(data.endDate) : null,
-    };
-    await this.db.insert(banners).values(bannerToInsert);
-    return bannerToInsert;
-  }
-
-  async updateBanner(id: string, data: Partial<Banner>): Promise<Banner | null> {
-    const updateData: Partial<Banner> = {
-      ...data,
-      startDate: data.startDate ? new Date(data.startDate) : null,
-      endDate: data.endDate ? new Date(data.endDate) : null,
-    };
-
-    await this.db.update(banners).set(updateData).where(eq(banners.id, id));
-
-    const updated = await this.db.select().from(banners).where(eq(banners.id, id));
-    return updated.length > 0 ? updated[0] : null;
-  }
-
-  async deleteBanner(id: string): Promise<boolean> {
-    const result = await this.db.delete(banners).where(eq(banners.id, id));
-    return result.affectedRows > 0;
   }
 }
 
