@@ -200,12 +200,19 @@ export default function Cart() {
                 <Card key={item.id} data-testid={`cart-item-${item.id}`}>
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-4">
-                      <img
-                        src={item.product?.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200"}
-                        alt={item.product?.name}
-                        className="w-20 h-20 object-cover rounded-lg"
-                        data-testid={`img-cart-item-${item.id}`}
-                      />
+                      <div className="relative">
+                        <img
+                          src={item.customDesign?.image || item.product?.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200"}
+                          alt={item.product?.name}
+                          className="w-20 h-20 object-cover rounded-lg"
+                          data-testid={`img-cart-item-${item.id}`}
+                        />
+                        {item.customDesign && (
+                          <div className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs px-1 py-0.5 rounded-full">
+                            Custom
+                          </div>
+                        )}
+                      </div>
                       
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground mb-1" data-testid={`text-cart-item-name-${item.id}`}>

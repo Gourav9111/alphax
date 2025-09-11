@@ -78,6 +78,19 @@ export default function Checkout() {
         color: item.color,
         price: item.product?.price || "0",
         name: item.product?.name || "",
+        // Include custom design data if it exists
+        ...(item.customDesign && {
+          customDesign: {
+            scale: item.customDesign.scale,
+            rotation: item.customDesign.rotation,
+            x: item.customDesign.x,
+            y: item.customDesign.y,
+            image: item.customDesign.image,
+            color: item.customDesign.color,
+            size: item.customDesign.size,
+            price: item.customDesign.price,
+          }
+        })
       }));
 
       const total = cartItems.reduce((sum, item) => {
