@@ -86,7 +86,7 @@ export default function Footer() {
         <div className="border-t border-muted-foreground/20 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-muted text-sm mb-4 md:mb-0" data-testid="text-footer-copyright">
-              © 2024 KAMIO Custom Lifestyle. All rights reserved.
+              © 2024 KAMIO. All rights reserved.
             </p>
             <div className="flex space-x-6 text-sm">
               <a href="#" className="text-muted hover:text-primary transition-colors" data-testid="link-footer-privacy">Privacy Policy</a>
