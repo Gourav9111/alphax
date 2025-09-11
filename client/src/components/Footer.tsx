@@ -18,7 +18,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-muted text-sm mb-4">
-              Creating custom apparel for sports teams, corporations, and individuals since 2020. Quality guaranteed.
+              Creating custom apparel for sports teams, corporations, and individuals since 2015. Quality guaranteed.
             </p>
             <div className="flex space-x-3">
               <a href="#" className="text-muted hover:text-primary transition-colors" data-testid="link-facebook">
