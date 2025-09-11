@@ -128,11 +128,38 @@ export default function Checkout() {
         const error = await response.json();
         throw new Error(error.message || "Failed to create order");
       }
+      
+      // Save address to user profile
+      try {
+        const addressOptions = createAuthenticatedRequest("/api/addresses", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: "Home", // Default address name
+            fullName: `${orderData.firstName} ${orderData.lastName}`,
+            phone: orderData.phone,
+            addressLine1: orderData.address,
+            addressLine2: "",
+            city: orderData.city,
+            state: orderData.state,
+            pincode: orderData.pincode,
+            isDefault: false, // Don't set as default automatically
+          }),
+        });
+        
+        await fetch("/api/addresses", addressOptions);
+        // Note: We don't throw on address save failure to avoid breaking the order flow
+      } catch (addressError) {
+        console.log("Failed to save address to profile:", addressError);
+        // Continue with order completion even if address save fails
+      }
+      
       return response.json();
     },
     onSuccess: (order) => {
       queryClient.invalidateQueries({ queryKey: ["/api/cart"] });
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/addresses"] });
       
       toast({
         title: "Order placed successfully!",
