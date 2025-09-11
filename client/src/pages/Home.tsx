@@ -82,6 +82,11 @@ function Home() {
                   CENTRAL INDIA'S BIGGEST PRINTING SERVICE
                 </Badge>
               </div>
+              <div className="text-center lg:text-left mb-2">
+                <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-primary mb-2 tracking-wider">
+                  KAMIO
+                </h2>
+              </div>
               <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
                 <span className="text-primary">CUSTOM</span>{" "}
                 <span className="text-yellow-600">JERSEYS</span>
