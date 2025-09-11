@@ -70,7 +70,7 @@ export default function PromoBanner({ className = "" }: PromoBannerProps) {
         <div className="relative">
           {/* Main Banner Content */}
           <div 
-            className="relative h-48 sm:h-64 md:h-80 bg-gradient-to-r from-[#E30613] to-[#FF1F2F] flex items-center cursor-pointer group"
+            className="relative h-48 sm:h-64 md:h-80 bg-gradient-to-r from-slate-700 to-slate-900 flex items-center cursor-pointer group"
             onClick={handleBannerClick}
             data-testid={`banner-${banner.id}`}
           >
@@ -105,7 +105,7 @@ export default function PromoBanner({ className = "" }: PromoBannerProps) {
                 
                 <Button 
                   size="lg" 
-                  className="bg-white text-[#E30613] hover:bg-white/90 font-semibold px-6 sm:px-8 py-3 text-base sm:text-lg group-hover:scale-105 transition-transform duration-200"
+                  className="bg-white text-slate-700 hover:bg-white/90 font-semibold px-6 sm:px-8 py-3 text-base sm:text-lg group-hover:scale-105 transition-transform duration-200"
                   data-testid={`banner-button-${banner.id}`}
                 >
                   {banner.buttonText}
