@@ -11,33 +11,33 @@
   --card-foreground: hsl(222.2 84% 4.9%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(222.2 84% 4.9%);
-  --primary: hsl(355 91% 65%);
+  --primary: hsl(142 72% 35%);
   --primary-foreground: hsl(210 40% 98%);
   --secondary: hsl(210 40% 96%);
   --secondary-foreground: hsl(222.2 84% 4.9%);
   --muted: hsl(210 40% 96%);
   --muted-foreground: hsl(215.4 16.3% 46.9%);
-  --accent: hsl(210 40% 96%);
+  --accent: hsl(46 96% 50%);
   --accent-foreground: hsl(222.2 84% 4.9%);
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: hsl(210 40% 98%);
   --border: hsl(214.3 31.8% 91.4%);
   --input: hsl(214.3 31.8% 91.4%);
-  --ring: hsl(355 91% 65%);
+  --ring: hsl(142 72% 35%);
   --radius: 0.75rem;
-  --chart-1: hsl(355 91% 65%);
-  --chart-2: hsl(159.7826 100% 36.0784%);
-  --chart-3: hsl(42.0290 92.8251% 56.2745%);
-  --chart-4: hsl(147.1429 78.5047% 41.9608%);
-  --chart-5: hsl(341.4894 75.2000% 50.9804%);
+  --chart-1: hsl(142 72% 35%);
+  --chart-2: hsl(46 96% 50%);
+  --chart-3: hsl(142 82% 45%);
+  --chart-4: hsl(46 86% 40%);
+  --chart-5: hsl(142 62% 25%);
   --sidebar: hsl(180 6.6667% 97.0588%);
   --sidebar-foreground: hsl(210 25% 7.8431%);
-  --sidebar-primary: hsl(355 91% 65%);
+  --sidebar-primary: hsl(142 72% 35%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
   --sidebar-accent: hsl(210 40% 96%);
-  --sidebar-accent-foreground: hsl(355 91% 65%);
+  --sidebar-accent-foreground: hsl(142 72% 35%);
   --sidebar-border: hsl(214.3 31.8% 91.4%);
-  --sidebar-ring: hsl(355 91% 65%);
+  --sidebar-ring: hsl(142 72% 35%);
   --font-sans: Inter, system-ui, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
@@ -50,19 +50,19 @@
   --card-foreground: hsl(0 0% 85.0980%);
   --popover: hsl(0 0% 0%);
   --popover-foreground: hsl(200 6.6667% 91.1765%);
-  --primary: hsl(355 91% 65%);
+  --primary: hsl(142 70% 45%);
   --primary-foreground: hsl(210 40% 98%);
   --secondary: hsl(195.0000 15.3846% 94.9020%);
   --secondary-foreground: hsl(210 25% 7.8431%);
   --muted: hsl(0 0% 9.4118%);
   --muted-foreground: hsl(210 3.3898% 46.2745%);
-  --accent: hsl(205.7143 70% 7.8431%);
-  --accent-foreground: hsl(355 91% 45%);
+  --accent: hsl(46 96% 60%);
+  --accent-foreground: hsl(142 70% 45%);
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: hsl(210 40% 98%);
   --border: hsl(210 5.2632% 14.9020%);
   --input: hsl(207.6923 27.6596% 18.4314%);
-  --ring: hsl(355 91% 65%);
+  --ring: hsl(142 70% 45%);
 }
 
 @layer base {
@@ -92,7 +92,7 @@
   
   .card-hover:hover {
     transform: translateY(-8px) rotateX(5deg);
-    box-shadow: 0 20px 40px rgba(255, 87, 87, 0.15);
+    box-shadow: 0 20px 40px hsl(var(--primary) / 0.15);
   }
   
   .logo-pulse {
@@ -122,7 +122,7 @@
   }
   
   .hero-gradient {
-    background: linear-gradient(135deg, hsl(355 91% 65%) 0%, hsl(355 91% 55%) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%);
   }
 
   /* Breaking News Marquee Animation */
