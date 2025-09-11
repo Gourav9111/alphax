@@ -85,6 +85,21 @@ export const addresses = pgTable("addresses", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const banners = pgTable("banners", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(), // e.g., "Navratri Festival Sale"
+  description: text("description").notNull(), // e.g., "Wear your group t-shirt with same logo and your own name"
+  image: text("image"), // Banner image URL
+  buttonText: text("button_text").notNull().default("Customize Your T-Shirt Now"),
+  redirectUrl: text("redirect_url").notNull().default("/customize"),
+  isActive: boolean("is_active").default(true),
+  priority: integer("priority").default(0), // Higher priority banners show first
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -121,6 +136,12 @@ export const insertAddressSchema = createInsertSchema(addresses).omit({
   createdAt: true,
 });
 
+export const insertBannerSchema = createInsertSchema(banners).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -136,3 +157,5 @@ export type CustomDesign = typeof customDesigns.$inferSelect;
 export type InsertCustomDesign = z.infer<typeof insertCustomDesignSchema>;
 export type Address = typeof addresses.$inferSelect;
 export type InsertAddress = z.infer<typeof insertAddressSchema>;
+export type Banner = typeof banners.$inferSelect;
+export type InsertBanner = z.infer<typeof insertBannerSchema>;

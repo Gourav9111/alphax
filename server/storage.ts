@@ -10,6 +10,7 @@ import {
   orders, 
   customDesigns,
   addresses,
+  banners,
   type User, 
   type InsertUser, 
   type Category, 
@@ -23,7 +24,9 @@ import {
   type CustomDesign, 
   type InsertCustomDesign,
   type Address,
-  type InsertAddress
+  type InsertAddress,
+  type Banner,
+  type InsertBanner,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -70,6 +73,14 @@ export interface IStorage {
   updateAddress(id: string, address: Partial<Address>): Promise<Address | undefined>;
   deleteAddress(id: string): Promise<boolean>;
   setDefaultAddress(userId: string, addressId: string): Promise<boolean>;
+
+  // Banner methods
+  getBanners(): Promise<Banner[]>;
+  getActiveBanners(): Promise<Banner[]>;
+  getBanner(id: string): Promise<Banner | undefined>;
+  createBanner(banner: InsertBanner): Promise<Banner>;
+  updateBanner(id: string, banner: Partial<Banner>): Promise<Banner | undefined>;
+  deleteBanner(id: string): Promise<boolean>;
 }
 
 // Initialize database connection
@@ -292,6 +303,41 @@ export class DatabaseStorage implements IStorage {
     
     // Then set the specified address as default
     const result = await db.update(addresses).set({ isDefault: true }).where(eq(addresses.id, addressId));
+    return result.rowCount > 0;
+  }
+
+  // Banner methods
+  async getBanners(): Promise<Banner[]> {
+    return await db.select().from(banners).orderBy(desc(banners.priority), desc(banners.createdAt));
+  }
+
+  async getActiveBanners(): Promise<Banner[]> {
+    const now = new Date();
+    return await db.select().from(banners)
+      .where(eq(banners.isActive, true))
+      .orderBy(desc(banners.priority), desc(banners.createdAt));
+  }
+
+  async getBanner(id: string): Promise<Banner | undefined> {
+    const result = await db.select().from(banners).where(eq(banners.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createBanner(bannerData: InsertBanner): Promise<Banner> {
+    const [banner] = await db.insert(banners).values(bannerData).returning();
+    return banner;
+  }
+
+  async updateBanner(id: string, bannerData: Partial<Banner>): Promise<Banner | undefined> {
+    const [banner] = await db.update(banners)
+      .set({ ...bannerData, updatedAt: new Date() })
+      .where(eq(banners.id, id))
+      .returning();
+    return banner;
+  }
+
+  async deleteBanner(id: string): Promise<boolean> {
+    const result = await db.delete(banners).where(eq(banners.id, id));
     return result.rowCount > 0;
   }
 }
