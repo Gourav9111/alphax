@@ -196,14 +196,52 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
+        {/* Professional Management Grid */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Management Dashboard</CardTitle>
+              <p className="text-muted-foreground">Quick access to all management features</p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Link href="/admin/orders">
+                  <Button variant="default" className="w-full h-16 bg-[#E30613] hover:bg-[#E30613]/90 text-white flex flex-col gap-1" data-testid="link-manage-orders">
+                    <ShoppingCart className="h-5 w-5" />
+                    <span className="text-sm">Orders</span>
+                  </Button>
+                </Link>
+                <Link href="/admin/products">
+                  <Button variant="outline" className="w-full h-16 flex flex-col gap-1" data-testid="link-manage-products">
+                    <Package className="h-5 w-5" />
+                    <span className="text-sm">Products</span>
+                  </Button>
+                </Link>
+                <Link href="/admin/users">
+                  <Button variant="outline" className="w-full h-16 flex flex-col gap-1" data-testid="link-manage-users">
+                    <Users className="h-5 w-5" />
+                    <span className="text-sm">Users</span>
+                  </Button>
+                </Link>
+                <Link href="/admin/banners">
+                  <Button variant="outline" className="w-full h-16 flex flex-col gap-1" data-testid="link-manage-banners">
+                    <TrendingUp className="h-5 w-5" />
+                    <span className="text-sm">Banners</span>
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Recent Orders */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Recent Orders</CardTitle>
               <Link href="/admin/orders">
-                <Button variant="default" size="lg" className="bg-[#E30613] hover:bg-[#E30613]/90 text-white" data-testid="link-view-all-orders">
-                  Manage Orders
+                <Button variant="default" size="sm" className="bg-[#E30613] hover:bg-[#E30613]/90 text-white" data-testid="link-view-all-orders">
+                  View All
                 </Button>
               </Link>
             </CardHeader>
@@ -250,23 +288,11 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Low Stock Alert</CardTitle>
-              <div className="flex gap-2">
-                <Link href="/admin/products">
-                  <Button variant="default" size="lg" className="bg-[#E30613] hover:bg-[#E30613]/90 text-white" data-testid="link-manage-products">
-                    Manage Products
-                  </Button>
-                </Link>
-                <Link href="/admin/banners">
-                  <Button variant="outline" size="lg" data-testid="link-manage-banners">
-                    Manage Banners
-                  </Button>
-                </Link>
-                <Link href="/admin/users">
-                  <Button variant="outline" size="lg" data-testid="link-manage-users">
-                    Manage Users
-                  </Button>
-                </Link>
-              </div>
+              <Link href="/admin/products">
+                <Button variant="default" size="sm" className="bg-[#E30613] hover:bg-[#E30613]/90 text-white" data-testid="link-products-stock">
+                  Manage Stock
+                </Button>
+              </Link>
             </CardHeader>
             <CardContent>
               {lowStockProducts.length === 0 ? (
