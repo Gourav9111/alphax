@@ -8,7 +8,8 @@ import {
   products, 
   cartItems, 
   orders, 
-  customDesigns, 
+  customDesigns,
+  addresses,
   type User, 
   type InsertUser, 
   type Category, 
@@ -20,7 +21,9 @@ import {
   type Order, 
   type InsertOrder, 
   type CustomDesign, 
-  type InsertCustomDesign 
+  type InsertCustomDesign,
+  type Address,
+  type InsertAddress
 } from "@shared/schema";
 
 export interface IStorage {
@@ -60,6 +63,13 @@ export interface IStorage {
   // Custom Designs
   getCustomDesigns(userId: string): Promise<CustomDesign[]>;
   createCustomDesign(design: InsertCustomDesign): Promise<CustomDesign>;
+
+  // Address methods
+  getAddresses(userId: string): Promise<Address[]>;
+  createAddress(address: InsertAddress): Promise<Address>;
+  updateAddress(id: string, address: Partial<Address>): Promise<Address | undefined>;
+  deleteAddress(id: string): Promise<boolean>;
+  setDefaultAddress(userId: string, addressId: string): Promise<boolean>;
 }
 
 // Initialize database connection
@@ -254,6 +264,35 @@ export class DatabaseStorage implements IStorage {
   async createCustomDesign(designData: InsertCustomDesign): Promise<CustomDesign> {
     const [design] = await db.insert(customDesigns).values(designData).returning();
     return design;
+  }
+
+  // Address methods
+  async getAddresses(userId: string): Promise<Address[]> {
+    return await db.select().from(addresses).where(eq(addresses.userId, userId)).orderBy(desc(addresses.createdAt));
+  }
+
+  async createAddress(addressData: InsertAddress): Promise<Address> {
+    const [address] = await db.insert(addresses).values(addressData).returning();
+    return address;
+  }
+
+  async updateAddress(id: string, addressData: Partial<Address>): Promise<Address | undefined> {
+    const [address] = await db.update(addresses).set(addressData).where(eq(addresses.id, id)).returning();
+    return address;
+  }
+
+  async deleteAddress(id: string): Promise<boolean> {
+    const result = await db.delete(addresses).where(eq(addresses.id, id));
+    return result.rowCount > 0;
+  }
+
+  async setDefaultAddress(userId: string, addressId: string): Promise<boolean> {
+    // First, unset all addresses as default for this user
+    await db.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
+    
+    // Then set the specified address as default
+    const result = await db.update(addresses).set({ isDefault: true }).where(eq(addresses.id, addressId));
+    return result.rowCount > 0;
   }
 }
 

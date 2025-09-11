@@ -80,6 +80,35 @@ export default function Customize() {
         throw new Error("Please login to add custom design to cart");
       }
       
+      let uploadedImageUrl = null;
+      
+      // If there's a custom image, upload it first
+      if (design.image) {
+        try {
+          // Convert base64 to blob
+          const response = await fetch(design.image);
+          const blob = await response.blob();
+          
+          // Create form data for upload
+          const formData = new FormData();
+          formData.append('image', blob, 'custom-design.png');
+          
+          // Upload the image
+          const uploadOptions = createAuthenticatedRequest("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+          
+          const uploadResponse = await fetch("/api/upload", uploadOptions);
+          if (uploadResponse.ok) {
+            const uploadResult = await uploadResponse.json();
+            uploadedImageUrl = uploadResult.url;
+          }
+        } catch (error) {
+          console.warn("Failed to upload custom image:", error);
+        }
+      }
+      
       const options = createAuthenticatedRequest("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +118,11 @@ export default function Customize() {
           size: selectedSize,
           color: selectedColor,
           customDesign: {
-            ...design,
+            scale: design.scale,
+            rotation: design.rotation,
+            x: design.x,
+            y: design.y,
+            image: uploadedImageUrl, // Use uploaded URL instead of base64
             color: selectedColor,
             size: selectedSize,
             price: totalPrice,
