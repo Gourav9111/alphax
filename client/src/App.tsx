@@ -19,6 +19,7 @@ import AdminProducts from "@/pages/admin/Products";
 import AdminOrders from "@/pages/admin/Orders";
 import AdminBanners from "@/pages/admin/Banners";
 import AdminUsers from "@/pages/admin/Users";
+import AdminThemeSettings from "@/pages/admin/ThemeSettings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -41,6 +42,7 @@ function Router() {
         <Route path="/admin/orders" component={AdminOrders} />
         <Route path="/admin/banners" component={AdminBanners} />
         <Route path="/admin/users" component={AdminUsers} />
+        <Route path="/admin/themes" component={AdminThemeSettings} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

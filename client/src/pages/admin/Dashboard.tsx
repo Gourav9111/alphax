@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { isAuthenticated, isAdmin, createAuthenticatedRequest } from "@/lib/auth";
 import { useLocation } from "wouter";
-import { Package, ShoppingCart, Users, TrendingUp, Clock, CheckCircle } from "lucide-react";
+import { Package, ShoppingCart, Users, TrendingUp, Clock, CheckCircle, Palette } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 
@@ -204,7 +204,7 @@ export default function AdminDashboard() {
               <p className="text-muted-foreground">Quick access to all management features</p>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <Link href="/admin/orders">
                   <Button variant="default" className="w-full h-16 bg-[#E30613] hover:bg-[#E30613]/90 text-white flex flex-col gap-1" data-testid="link-manage-orders">
                     <ShoppingCart className="h-5 w-5" />
@@ -227,6 +227,12 @@ export default function AdminDashboard() {
                   <Button variant="outline" className="w-full h-16 flex flex-col gap-1" data-testid="link-manage-banners">
                     <TrendingUp className="h-5 w-5" />
                     <span className="text-sm">Banners</span>
+                  </Button>
+                </Link>
+                <Link href="/admin/themes">
+                  <Button variant="outline" className="w-full h-16 flex flex-col gap-1" data-testid="link-manage-themes">
+                    <Palette className="h-5 w-5" />
+                    <span className="text-sm">Themes</span>
                   </Button>
                 </Link>
               </div>
