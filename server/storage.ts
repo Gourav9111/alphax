@@ -11,6 +11,7 @@ import {
   customDesigns,
   addresses,
   banners,
+  themeSettings,
   type User, 
   type InsertUser, 
   type Category, 
@@ -27,6 +28,8 @@ import {
   type InsertAddress,
   type Banner,
   type InsertBanner,
+  type ThemeSettings,
+  type InsertThemeSettings,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -81,6 +84,15 @@ export interface IStorage {
   createBanner(banner: InsertBanner): Promise<Banner>;
   updateBanner(id: string, banner: Partial<Banner>): Promise<Banner | undefined>;
   deleteBanner(id: string): Promise<boolean>;
+
+  // Theme methods
+  getThemeSettings(): Promise<ThemeSettings[]>;
+  getActiveTheme(): Promise<ThemeSettings | undefined>;
+  getThemeById(id: string): Promise<ThemeSettings | undefined>;
+  createTheme(theme: InsertThemeSettings): Promise<ThemeSettings>;
+  updateTheme(id: string, theme: Partial<ThemeSettings>): Promise<ThemeSettings | undefined>;
+  setActiveTheme(id: string): Promise<boolean>;
+  deleteTheme(id: string): Promise<boolean>;
 }
 
 // Initialize database connection
@@ -356,6 +368,60 @@ export class DatabaseStorage implements IStorage {
 
   async deleteBanner(id: string): Promise<boolean> {
     const result = await db.delete(banners).where(eq(banners.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Theme methods
+  async getThemeSettings(): Promise<ThemeSettings[]> {
+    return await db.select().from(themeSettings).orderBy(desc(themeSettings.createdAt));
+  }
+
+  async getActiveTheme(): Promise<ThemeSettings | undefined> {
+    const result = await db.select().from(themeSettings).where(eq(themeSettings.isActive, true)).limit(1);
+    return result[0];
+  }
+
+  async getThemeById(id: string): Promise<ThemeSettings | undefined> {
+    const result = await db.select().from(themeSettings).where(eq(themeSettings.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createTheme(themeData: InsertThemeSettings): Promise<ThemeSettings> {
+    const [theme] = await db.insert(themeSettings).values(themeData).returning();
+    return theme;
+  }
+
+  async updateTheme(id: string, themeData: Partial<ThemeSettings>): Promise<ThemeSettings | undefined> {
+    const [theme] = await db.update(themeSettings)
+      .set({ ...themeData, updatedAt: new Date() })
+      .where(eq(themeSettings.id, id))
+      .returning();
+    return theme;
+  }
+
+  async setActiveTheme(id: string): Promise<boolean> {
+    try {
+      // Ensure the theme exists first
+      const themeExists = await db.select().from(themeSettings).where(eq(themeSettings.id, id)).limit(1);
+      if (themeExists.length === 0) {
+        return false;
+      }
+
+      // Perform atomic operation: deactivate all themes, then activate the specified one
+      await db.update(themeSettings).set({ isActive: false, updatedAt: new Date() });
+      const result = await db.update(themeSettings)
+        .set({ isActive: true, updatedAt: new Date() })
+        .where(eq(themeSettings.id, id));
+      
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Error setting active theme:", error);
+      return false;
+    }
+  }
+
+  async deleteTheme(id: string): Promise<boolean> {
+    const result = await db.delete(themeSettings).where(eq(themeSettings.id, id));
     return result.rowCount > 0;
   }
 }

@@ -7,7 +7,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import multer from "multer";
 import { storage } from "./storage.js";
-import { insertUserSchema, insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema, insertBannerSchema, insertAddressSchema } from "@shared/schema";
+import { insertUserSchema, insertProductSchema, insertCategorySchema, insertCartItemSchema, insertOrderSchema, insertBannerSchema, insertAddressSchema, insertThemeSettingsSchema } from "@shared/schema";
 
 // Extend Express Request type to include user
 declare global {
@@ -660,6 +660,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(usersWithAddresses);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch users with addresses", error: error.message });
+    }
+  });
+
+  // Public theme routes - to get active theme for site styling
+  app.get("/api/theme", async (req, res) => {
+    console.log("🎨 /api/theme handler hit!"); // Debug log
+    try {
+      const activeTheme = await storage.getActiveTheme();
+      if (!activeTheme) {
+        // Return default theme if no active theme is set
+        return res.json({
+          primaryColor: "hsl(142 72% 35%)",
+          secondaryColor: "hsl(210 40% 96%)",
+          accentColor: "hsl(46 96% 50%)",
+          backgroundColor: "hsl(0 0% 100%)",
+          textColor: "hsl(222.2 84% 4.9%)",
+          fontFamily: "Inter, system-ui, sans-serif",
+          borderRadius: "0.75rem"
+        });
+      }
+      res.json(activeTheme);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch active theme", error });
+    }
+  });
+
+  // Admin theme management routes
+  app.get("/api/admin/themes", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const themes = await storage.getThemeSettings();
+      res.json(themes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch themes", error });
+    }
+  });
+
+  app.get("/api/admin/themes/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const theme = await storage.getThemeById(req.params.id);
+      if (!theme) {
+        return res.status(404).json({ message: "Theme not found" });
+      }
+      res.json(theme);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch theme", error });
+    }
+  });
+
+  app.post("/api/admin/themes", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertThemeSettingsSchema.parse(req.body);
+      const theme = await storage.createTheme(validatedData);
+      res.status(201).json(theme);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create theme", error });
+    }
+  });
+
+  app.put("/api/admin/themes/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const validatedData = insertThemeSettingsSchema.partial().parse(req.body);
+      const theme = await storage.updateTheme(req.params.id, validatedData);
+      if (!theme) {
+        return res.status(404).json({ message: "Theme not found" });
+      }
+      res.json(theme);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update theme", error });
+    }
+  });
+
+  app.post("/api/admin/themes/:id/activate", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const success = await storage.setActiveTheme(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Theme not found" });
+      }
+      res.json({ message: "Theme activated successfully" });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to activate theme", error });
+    }
+  });
+
+  app.delete("/api/admin/themes/:id", authenticateToken, requireAdmin, async (req, res) => {
+    try {
+      const success = await storage.deleteTheme(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Theme not found" });
+      }
+      res.json({ message: "Theme deleted successfully" });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to delete theme", error });
     }
   });
 
