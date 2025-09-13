@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Layout from "@/components/Layout";
+import { useTheme } from "@/hooks/useTheme";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
@@ -22,7 +23,9 @@ import AdminUsers from "@/pages/admin/Users";
 import AdminThemeSettings from "@/pages/admin/ThemeSettings";
 import NotFound from "@/pages/not-found";
 
-function Router() {
+function ThemedApp() {
+  useTheme(); // This will fetch and apply the active theme
+  
   return (
     <Layout>
       <Switch>
@@ -54,7 +57,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        <ThemedApp />
       </TooltipProvider>
     </QueryClientProvider>
   );

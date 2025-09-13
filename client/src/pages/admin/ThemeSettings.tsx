@@ -166,9 +166,6 @@ export default function AdminThemeSettings() {
         title: "Theme activated",
         description: `${theme?.name || 'Theme'} is now active on your site.`,
       });
-      
-      // Reload the page to apply the new theme
-      setTimeout(() => window.location.reload(), 1000);
     },
     onError: (error: any) => {
       toast({
