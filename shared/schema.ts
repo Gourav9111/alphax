@@ -100,6 +100,21 @@ export const banners = pgTable("banners", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const themeSettings = pgTable("theme_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(), // Theme name like "Default", "Dark Mode", etc.
+  primaryColor: text("primary_color").notNull().default("hsl(142 72% 35%)"), // Main brand color
+  secondaryColor: text("secondary_color").notNull().default("hsl(210 40% 96%)"),
+  accentColor: text("accent_color").notNull().default("hsl(46 96% 50%)"), // Accent color
+  backgroundColor: text("background_color").notNull().default("hsl(0 0% 100%)"),
+  textColor: text("text_color").notNull().default("hsl(222.2 84% 4.9%)"),
+  fontFamily: text("font_family").notNull().default("Inter, system-ui, sans-serif"),
+  borderRadius: text("border_radius").notNull().default("0.75rem"),
+  isActive: boolean("is_active").default(false), // Only one theme can be active
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -142,6 +157,12 @@ export const insertBannerSchema = createInsertSchema(banners).omit({
   updatedAt: true,
 });
 
+export const insertThemeSettingsSchema = createInsertSchema(themeSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -159,3 +180,5 @@ export type Address = typeof addresses.$inferSelect;
 export type InsertAddress = z.infer<typeof insertAddressSchema>;
 export type Banner = typeof banners.$inferSelect;
 export type InsertBanner = z.infer<typeof insertBannerSchema>;
+export type ThemeSettings = typeof themeSettings.$inferSelect;
+export type InsertThemeSettings = z.infer<typeof insertThemeSettingsSchema>;
